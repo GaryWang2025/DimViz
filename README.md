@@ -2,6 +2,11 @@
 
 > **Dim**ension **Viz**ualizer — 一维到三维数学空间动态可视化
 
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-Click%20Me-blue?style=for-the-badge)](https://68b73c2252df4cf786cafccb8f3ba949.app.codebuddy.work/output/dimension-visualizer.html)
+[![GitHub Pages](https://img.shields.io/badge/📄%20GitHub%20Pages-Visit-brightgreen?style=for-the-badge)](https://garywang2025.github.io/DimViz/)
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)]()
+[![GitHub Stars](https://img.shields.io/github/stars/GaryWang2025/DimViz?style=for-the-badge)](https://github.com/GaryWang2025/DimViz)
+
 [中文](#中文) | [English](#english)
 
 ---
@@ -15,7 +20,13 @@
 - 🎬 **Auto Demo Mode** — Watch dimensions unfold: 1D → 2D → 3D with smooth animations
 - 🔄 **Auto Rotate** — Orbits the scene automatically for better spatial intuition
 - 📝 **KaTeX Formula Panel** — Real-time LaTeX rendering of mathematical definitions
-- 🌙 **Light Theme** — High-contrast colors, easy on the eyes
+- ☀️ **Light Theme** — High-contrast colors, easy on the eyes
+
+### 🚀 Live Demo
+
+☛ **[Try DimViz online →](https://68b73c2252df4cf786cafccb8f3ba949.app.codebuddy.work/output/dimension-visualizer.html)**
+
+No install, no build — click and explore!
 
 ### 🚀 Quick Start
 
@@ -47,7 +58,9 @@ Or simply download `output/dimension-visualizer.html` and double-click it.
 
 ### 📸 Screenshots
 
-> *Screenshots coming soon — open the HTML file to see it in action!*
+![DimViz 3D Visualization](output/screenshot.png)
+
+> Open the [Live Demo](https://68b73c2252df4cf786cafccb8f3ba949.app.codebuddy.work/output/dimension-visualizer.html) to interact with it!
 
 ### 🤝 Contributing
 
