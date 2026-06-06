@@ -1,3 +1,0 @@
-Line 409:
-    new THREE.SphereGeometry(0.14, 16, 16),
-    new THREE.MeshPhongMaterial({color:0xff3366, emissive:0xcc0022, shininess:80})
