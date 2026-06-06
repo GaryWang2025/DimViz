@@ -179,6 +179,22 @@
       bottom: 50px;
       left: 50%;
       transform: translateX(-50%);
+      background: rgba(220,240,255,0.95);
+      border: 1px solid #6080d0;
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 0.78rem;
+      color: #3050a0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #hint-4d.show { opacity: 1; }
+    #hint-4d {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
       background: rgba(220,232,255,0.95);
       border: 1px solid #6080d0;
       border-radius: 20px;
@@ -204,6 +220,7 @@
     <div id="dim-badge">3D</div>
     <div id="progress-wrap"><div id="progress-bar"></div></div>
     <div id="demo-hint">自动演示进行中…</div>
+    <div id="hint-4d">4D旋转中…</div>
   </div>
 
   <div id="formula-panel">
@@ -315,6 +332,7 @@ angle = \sum_{i=1}^{4} u_i v_i$$</div>
     <button id="btn-2d" onclick="setDim(2)">2D</button>
     <button id="btn-3d" onclick="setDim(3)">3D</button>
     <button id="btn-4d" onclick="setDim(4)">4D</button>
+    <button id="btn-4d-rotate" onclick="toggle4DRotate()">⟳ 4D旋转</button>
   </div>
   <div class="divider"></div>
   <div class="ctrl-group">
