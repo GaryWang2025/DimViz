@@ -23,7 +23,7 @@ No build step required — just open in a browser:
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/DimViz.git
+git clone https://github.com/GaryWang2025/DimViz.git
 
 # Open directly
 open output/dimension-visualizer.html
@@ -76,7 +76,7 @@ MIT © 2026
 
 ```bash
 # 克隆仓库
-git clone https://github.com/YOUR_USERNAME/DimViz.git
+git clone https://github.com/GaryWang2025/DimViz.git
 
 # 直接打开
 open output/dimension-visualizer.html

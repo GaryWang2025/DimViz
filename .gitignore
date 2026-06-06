@@ -1,0 +1,11 @@
+# DimViz .gitignore
+
+# WorkBuddy internal
+.workbuddy/
+
+# Node modules (if any)
+node_modules/
+
+# O/S files
+.DS_Store
+Thumbs.db
