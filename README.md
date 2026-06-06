@@ -83,7 +83,7 @@ We're actively planning **V003** (next major version). Current ideas include:
 - Mobile-friendly UI
 - Chinese/English language toggle
 
-**Tell us what YOU want!** → [Vote or suggest on Issue #2](https://github.com/GaryWang2025/DimViz/issues/2)
+**Tell us what YOU want!** → [Vote or suggest on Issue #1](https://github.com/GaryWang2025/DimViz/issues/1)
 
 ### 📄 License
 
