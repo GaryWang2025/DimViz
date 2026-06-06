@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>维度数学图示 | Dimension Visualizer</title>
+  <title>维度数学图示 V002 | Dimension Visualizer 4D</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -174,13 +174,29 @@
       transition: opacity 0.4s;
     }
     #demo-hint.show { opacity: 1; }
+    #hint-4d {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(220,232,255,0.95);
+      border: 1px solid #6080d0;
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 0.78rem;
+      color: #3050a0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #hint-4d.show { opacity: 1; }
     .katex-block { overflow-x: auto; padding: 2px 0; }
   </style>
 </head>
 <body>
 <div id="header">
-  <h1>维度数学图示</h1>
-  <span class="subtitle">Dimension Visualizer — ℝ¹ → ℝ² → ℝ³</span>
+  <h1>维度数学图示 <span style='font-size:0.7rem;opacity:0.7;'>V002 &middot; 4D</span></h1>
+  <span class="subtitle">Dimension Visualizer — ℝ¹ → ℝ² → ℝ³ → ℝ⁴</span>
 </div>
 <div id="main">
   <div id="canvas-wrap">
@@ -297,7 +313,8 @@ angle = \sum_{i=1}^{4} u_i v_i$$</div>
   <div class="ctrl-group">
     <button id="btn-1d" onclick="setDim(1)">1D</button>
     <button id="btn-2d" onclick="setDim(2)">2D</button>
-    <button id="btn-3d" class="active" onclick="setDim(3)">3D</button>
+    <button id="btn-3d" onclick="setDim(3)">3D</button>
+    <button id="btn-4d" onclick="setDim(4)">4D</button>
   </div>
   <div class="divider"></div>
   <div class="ctrl-group">
@@ -734,6 +751,15 @@ function animate() {
       const overall = (totalIdx + stepProg) / demoSteps.length;
       document.getElementById('progress-bar').style.width = (overall*100).toFixed(1) + '%';
     }
+  }
+
+  // 4D auto-rotation
+  if(is4DRotating && currentDim===4) {
+    rotAngleXY += 0.008;
+    rotAngleXW += 0.005;
+    rotAngleYZ += 0.003;
+    rotAngleYW += 0.007;
+    rebuild4DGeometry();
   }
 
   controls.update();
