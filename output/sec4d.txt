@@ -1,0 +1,27 @@
+
+    <!-- 4D 公式（新增） -->
+    <div class="formula-section" id="sec-4d">
+      <h3>ℝ⁴ · 四维空间</h3>
+      <div class="def-title">空间定义</div>
+      <div class="desc">四个独立实数坐标的有序四元组，无法直接视觉感知，通过投影与类比理解。</div>
+      <div class="katex-block">$$\mathbb{R}^4 = \{(x_1,x_2,x_3,x_4) \mid x_i \in \mathbb{R}\}$$</div>
+      <div class="def-title">标准正交基</div>
+      <div class="katex-block">$$\mathbf{e}_1=\begin{pmatrix}1\\0\\0\\0\end{pmatrix},\mathbf{e}_2=\begin{pmatrix}0\\1\\0\\0\end{pmatrix}$$</div>
+      <div class="katex-block">$$\mathbf{e}_3=\begin{pmatrix}0\\0\\1\\0\end{pmatrix},\mathbf{e}_4=\begin{pmatrix}0\\0\\0\\1\end{pmatrix}$$</div>
+      <div class="katex-block">$$\dim(\mathbb{R}^4) = 4$$</div>
+      <div class="def-title">欧氏范数</div>
+      <div class="katex-block">$$\|\mathbf{v}\|_2 = \sqrt{v_1^2 + v_2^2 + v_3^2 + v_4^2}$$</div>
+      <div class="def-title">内积</div>
+      <div class="katex-block">$$\langle \mathbf{u}, \mathbf{v} \rangle = \sum_{i=1}^{4} u_i v_i$$</div>
+      <div class="def-title">4D 旋转矩阵 $SO(4)$</div>
+      <div class="desc">4D 中的旋转发生在两个坐标平面（如 $xy, xw, yw$ 等），共 6 个独立旋转平面。</div>
+      <div class="katex-block">$$R_{xw}(\theta) = \begin{pmatrix}\cos\theta & 0 & 0 & -\sin\theta \\ 0&1&0&0 \\ 0&0&1&0 \\ \sin\theta & 0 & 0 & \cos\theta\end{pmatrix}$$</div>
+      <div class="def-title">超立方体（Tesseract）</div>
+      <div class="desc">ℝ⁴ 中的立方体类比：8 个立方体胞腔、24 个正方形面、32 条边、16 个顶点。</div>
+      <div class="katex-block">$$\text{顶点：} (\pm 1, \pm 1, \pm 1, \pm 1) \quad (16 \text{ 个})$$</div>
+      <div class="def-title">单位超球面 $S^3$</div>
+      <div class="desc">ℝ⁴ 中到原点距离为 1 的点的集合（三维超球面）。</div>
+      <div class="katex-block">$$S^3 = \{\mathbf{v} \in \mathbb{R}^4 \mid \|\mathbf{v}\| = 1\}$$</div>
+      <div class="katex-block">$$\text{超体积}(S^3) = 2\pi^2$$</div>
+    </div>
+
