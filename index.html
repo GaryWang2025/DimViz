@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>维度数学图示 | Dimension Visualizer</title>
+  <title>维度数学图示 V002 | Dimension Visualizer 4D</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -174,13 +174,45 @@
       transition: opacity 0.4s;
     }
     #demo-hint.show { opacity: 1; }
+    #hint-4d {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(220,240,255,0.95);
+      border: 1px solid #6080d0;
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 0.78rem;
+      color: #3050a0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #hint-4d.show { opacity: 1; }
+    #hint-4d {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(220,232,255,0.95);
+      border: 1px solid #6080d0;
+      border-radius: 20px;
+      padding: 6px 18px;
+      font-size: 0.78rem;
+      color: #3050a0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #hint-4d.show { opacity: 1; }
     .katex-block { overflow-x: auto; padding: 2px 0; }
   </style>
 </head>
 <body>
 <div id="header">
-  <h1>维度数学图示</h1>
-  <span class="subtitle">Dimension Visualizer — ℝ¹ → ℝ² → ℝ³</span>
+  <h1>维度数学图示 <span style='font-size:0.7rem;opacity:0.7;'>V002 &middot; 4D</span></h1>
+  <span class="subtitle">Dimension Visualizer — ℝ¹ → ℝ² → ℝ³ → ℝ⁴</span>
 </div>
 <div id="main">
   <div id="canvas-wrap">
@@ -188,6 +220,7 @@
     <div id="dim-badge">3D</div>
     <div id="progress-wrap"><div id="progress-bar"></div></div>
     <div id="demo-hint">自动演示进行中…</div>
+    <div id="hint-4d">4D旋转中…</div>
   </div>
 
   <div id="formula-panel">
@@ -261,6 +294,33 @@
       <div class="def-title">单位球面</div>
       <div class="katex-block">$$S^2 = \{\mathbf{v}\in\mathbb{R}^3 \mid \|\mathbf{v}\|=1\}$$</div>
     </div>
+    <!-- 4D 公式（新增） -->
+    <div class="formula-section" id="sec-4d">
+      <h3>ℝ⁴ · 四维空间</h3>
+      <div class="def-title">空间定义</div>
+      <div class="desc">四个独立实数坐标的有序四元组，无法直接视觉感知，通过投影与类比理解。</div>
+      <div class="katex-block">$$\mathbb{R}^4 = \{(x_1,x_2,x_3,x_4) \mid x_i \in \mathbb{R}\}$$</div>
+      <div class="def-title">标准正交基</div>
+      <div class="katex-block">$$\mathbf{e}_1=egin{pmatrix}1\0\0\0\end{pmatrix},\mathbf{e}_2=egin{pmatrix}0\1\0\0\end{pmatrix}$$</div>
+      <div class="katex-block">$$\mathbf{e}_3=egin{pmatrix}0\0\1\0\end{pmatrix},\mathbf{e}_4=egin{pmatrix}0\0\0\1\end{pmatrix}$$</div>
+      <div class="katex-block">$$\dim(\mathbb{R}^4) = 4$$</div>
+      <div class="def-title">欧氏范数</div>
+      <div class="katex-block">$$\|\mathbf{v}\|_2 = \sqrt{v_1^2 + v_2^2 + v_3^2 + v_4^2}$$</div>
+      <div class="def-title">内积</div>
+      <div class="katex-block">$$\langle \mathbf{u}, \mathbf{v} 
+angle = \sum_{i=1}^{4} u_i v_i$$</div>
+      <div class="def-title">4D 旋转矩阵 $SO(4)$</div>
+      <div class="desc">4D 中的旋转发生在两个坐标平面（如 $xy, xw, yw$ 等），共 6 个独立旋转平面。</div>
+      <div class="katex-block">$$R_{xw}(	heta) = egin{pmatrix}\cos	heta & 0 & 0 & -\sin	heta \ 0&1&0&0 \ 0&0&1&0 \ \sin	heta & 0 & 0 & \cos	heta\end{pmatrix}$$</div>
+      <div class="def-title">超立方体（Tesseract）</div>
+      <div class="desc">ℝ⁴ 中的立方体类比：8 个立方体胞腔、24 个正方形面、32 条边、16 个顶点。</div>
+      <div class="katex-block">$$	ext{顶点：} (\pm 1, \pm 1, \pm 1, \pm 1) \quad (16 	ext{ 个})$$</div>
+      <div class="def-title">单位超球面 $S^3$</div>
+      <div class="desc">ℝ⁴ 中到原点距离为 1 的点的集合（三维超球面）。</div>
+      <div class="katex-block">$$S^3 = \{\mathbf{v} \in \mathbb{R}^4 \mid \|\mathbf{v}\| = 1\}$$</div>
+      <div class="katex-block">$$	ext{超体积}(S^3) = 2\pi^2$$</div>
+    </div>
+
 
   </div>
 </div>
@@ -270,7 +330,9 @@
   <div class="ctrl-group">
     <button id="btn-1d" onclick="setDim(1)">1D</button>
     <button id="btn-2d" onclick="setDim(2)">2D</button>
-    <button id="btn-3d" class="active" onclick="setDim(3)">3D</button>
+    <button id="btn-3d" onclick="setDim(3)">3D</button>
+    <button id="btn-4d" onclick="setDim(4)">4D</button>
+    <button id="btn-4d-rotate" onclick="toggle4DRotate()">⟳ 4D旋转</button>
   </div>
   <div class="divider"></div>
   <div class="ctrl-group">
@@ -324,7 +386,8 @@ resize();
 const g1d = new THREE.Group();
 const g2d = new THREE.Group();
 const g3d = new THREE.Group();
-scene.add(g1d, g2d, g3d);
+const g4d = new THREE.Group();
+scene.add(g1d, g2d, g3d, g4d);
 
 // Helper: Arrow
 function makeArrow(dir, origin, length, color, headLen=0.18) {
@@ -458,7 +521,128 @@ function build3D() {
   g3d.add(orig);
 }
 
-build1D(); build2D(); build3D();
+    // ═════════════════════════════════════
+    // ─── 4D 超立方体（Tesseract）───
+    // ═════════════════════════════════════
+
+    // 4D 顶点：16 个 (±1, ±1, ±1, ±1)
+    function getTesseractVertices() {
+      const verts = [];
+      for (let i = 0; i < 16; i++) {
+        verts.push([
+          (i & 1) ? 1 : -1,
+          (i & 2) ? 1 : -1,
+          (i & 4) ? 1 : -1,
+          (i & 8) ? 1 : -1,
+        ]);
+      }
+      return verts;
+    }
+
+    // 4D 边：两个顶点恰好有 1 个坐标不同时为边
+    function getTesseractEdges(verts) {
+      const edges = [];
+      for (let i = 0; i < 16; i++) {
+        for (let j = i + 1; j < 16; j++) {
+          let diff = 0;
+          for (let k = 0; k < 4; k++) {
+            if (verts[i][k] !== verts[j][k]) diff++;
+          }
+          if (diff === 1) edges.push([i, j]);
+        }
+      }
+      return edges;
+    }
+
+    // 4D→3D 透视投影
+    function project4DTo3D(v4, focalLength) {
+      const f = focalLength !== undefined ? focalLength : 3.0;
+      const w = v4[3];
+      const denom = f - w;
+      const scale = f / (Math.abs(denom) < 0.01 ? 0.01 : denom);
+      return [v4[0] * scale, v4[1] * scale, v4[2] * scale];
+    }
+
+    // 根据 w 坐标生成颜色（蓝→红渐变）
+    // w 颜色映射：蓝(Blue) -> 紫(Purple) -> 红(Red)
+    // 色相 240->360->0，完全绕过黄/绿，在浅色背景上极醒目
+    function colorFromW(w) {
+      const t = (w + 2) / 4;  // t in [0,1]
+      const hue = (240 + 120 * t) % 360;  // 240(蓝) -> 300(紫) -> 0(红)
+      return new THREE.Color().setHSL(hue / 360, 1.0, 0.62);
+    }
+
+    // 4D 旋转：在 XY、XW、YZ、YW 平面上旋转
+    let rotAngleXY = 0, rotAngleXW = 0, rotAngleYZ = 0, rotAngleYW = 0;
+    function rotate4D(v, aXY, aXW, aYZ, aYW) {
+      let [x,y,z,w] = v;
+      const c1=Math.cos(aXY), s1=Math.sin(aXY);
+      let x1=c1*x-s1*y, y1=s1*x+c1*y;
+      const c2=Math.cos(aYZ), s2=Math.sin(aYZ);
+      let z1=c2*z-s2*w, w1=s2*z+c2*w;
+      const c3=Math.cos(aXW), s3=Math.sin(aXW);
+      let x2=c3*x1-s3*w1, w2=s3*x1+c3*w1;
+      const c4=Math.cos(aYW), s4=Math.sin(aYW);
+      let y2=c4*y1-s4*w2, w3=s4*y1+c4*w2;
+      return [x2, y2, z1, w3];
+    }
+
+    // 构建 4D 场景
+    let tesseractVerts4D = getTesseractVertices();
+    let tesseractEdges = getTesseractEdges(tesseractVerts4D);
+    let is4DRotating = true;
+
+    function rebuild4DGeometry() {
+      while (g4d.children.length > 0) {
+        const child = g4d.children[0];
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+        g4d.remove(child);
+      }
+      const rotated = tesseractVerts4D.map(v => rotate4D(v, rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW));
+      const pts3D = rotated.map(v => project4DTo3D(v, 3.5));
+      const edgeMat = new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:0.9});  // 深灰，浅色背景最醒目
+      for (const [i,j] of tesseractEdges) {
+        const geo = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(pts3D[i][0], pts3D[i][1], pts3D[i][2]),
+          new THREE.Vector3(pts3D[j][0], pts3D[j][1], pts3D[j][2])
+        ]);
+        const line = new THREE.Line(geo, edgeMat.clone());
+        g4d.add(line);
+      }
+      for (let i = 0; i < rotated.length; i++) {
+        const w = rotated[i][3];
+        const c = colorFromW(w);
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.12, 10, 10),
+          new THREE.MeshPhongMaterial({color:c, emissive:c.clone().multiplyScalar(0.3), shininess:80})
+        );
+        dot.position.set(pts3D[i][0], pts3D[i][1], pts3D[i][2]);
+        g4d.add(dot);
+      }
+      // 4D 基向量箭头
+      const bases = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+      const bColors = [0xff3333, 0x33cc55, 0x3366ff, 0xddaa00];
+      for (let i = 0; i < 4; i++) {
+        const rot = rotate4D(bases[i], rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW);
+        const p = project4DTo3D(rot, 3.5);
+        const len = Math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]) || 0.01;
+        g4d.add(new THREE.ArrowHelper(
+          new THREE.Vector3(p[0]/len, p[1]/len, p[2]/len),
+          new THREE.Vector3(0,0,0), len*1.5, bColors[i], 0.18, 0.1
+        ));
+      }
+      // S^3 切片（3D 球面）
+      g4d.add(new THREE.Mesh(
+        new THREE.SphereGeometry(1.0, 20, 16),
+        new THREE.MeshBasicMaterial({color:0x8844cc, wireframe:true, transparent:true, opacity:0.12})
+      ));
+    }
+
+    function build4D() { rebuild4DGeometry(); }
+    g4d.add(new THREE.Group());  // 初始化 g4d
+
+build1D(); build2D(); build3D(); build4D();
 
 // Lighting
 const ambient = new THREE.AmbientLight(0xffffff, 2.0);
@@ -481,13 +665,14 @@ function setDim(d, fromDemo=false) {
   g1d.visible = d === 1;
   g2d.visible = d === 2;
   g3d.visible = d === 3;
+  g4d.visible = d === 4;
 
   document.getElementById('dim-badge').textContent = d + 'D';
 
   document.querySelectorAll('.formula-section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-' + d + 'd').classList.add('active');
 
-  ['1','2','3'].forEach(n => {
+  ['1','2','3','4'].forEach(n => {
     document.getElementById('btn-'+n+'d').classList.toggle('active', n == d);
   });
 
@@ -503,7 +688,7 @@ function setDim(d, fromDemo=false) {
 setDim(3);
 
 // ─────────────── Auto Demo ───────────────
-const demoSteps = [1, 2, 3];
+const demoSteps = [1, 2, 3, 4];
 let demoIdx = 0;
 let demoStart = 0;
 const stepDuration = 3200; // ms per step
@@ -535,6 +720,17 @@ function toggleAutoRotate() {
   controls.autoRotate = !controls.autoRotate;
   document.getElementById('btn-rotate').classList.toggle('active', controls.autoRotate);
 }
+
+function toggle4DRotate() {
+    is4DRotating = !is4DRotating;
+    document.getElementById('btn-4d-rotate').classList.toggle('active', is4DRotating);
+    var hint = document.getElementById('hint-4d');
+    if (is4DRotating && currentDim === 4) {
+      hint.classList.add('show');
+    } else {
+      hint.classList.remove('show');
+    }
+  }
 
 function resetCamera() {
   camera.position.set(5, 4, 6);
@@ -573,6 +769,15 @@ function animate() {
       const overall = (totalIdx + stepProg) / demoSteps.length;
       document.getElementById('progress-bar').style.width = (overall*100).toFixed(1) + '%';
     }
+  }
+
+  // 4D auto-rotation
+  if(is4DRotating && currentDim===4) {
+    rotAngleXY += 0.008;
+    rotAngleXW += 0.005;
+    rotAngleYZ += 0.003;
+    rotAngleYW += 0.007;
+    rebuild4DGeometry();
   }
 
   controls.update();
