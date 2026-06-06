@@ -65,9 +65,25 @@ Or simply download `output/dimension-visualizer.html` and double-click it.
 
 > Open the [Live Demo](https://68b73c2252df4cf786cafccb8f3ba949.app.codebuddy.work/output/dimension-visualizer.html) to interact with it!
 
-### 🤝 Contributing
+### 🤝 Contributing & Feedback
 
-PRs welcome! Ideas for higher dimensions (4D projections), more math concepts, or UI improvements are all appreciated.
+We'd love to hear from you! Here's how you can help:
+
+- 🐛 **Found a bug?** → [Open an Issue](https://github.com/GaryWang2025/DimViz/issues/new?template=bug_report.md)
+- 💡 **Have an idea?** → [Suggest a feature](https://github.com/GaryWang2025/DimViz/issues/new?template=feature_request.md)
+- 📢 **General feedback?** → [Start a discussion](https://github.com/GaryWang2025/DimViz/issues/new?template=feedback.md)
+- 🔧 **Want to contribute code?** → PRs are very welcome!
+
+#### V003 Planning 🚀
+
+We're actively planning **V003** (next major version). Current ideas include:
+- 5D visualization (if possible!)
+- More math concepts (manifolds, vector fields, surfaces)
+- Export/screenshot functionality
+- Mobile-friendly UI
+- Chinese/English language toggle
+
+**Tell us what YOU want!** → [Vote or suggest on Issue #2](https://github.com/GaryWang2025/DimViz/issues/2)
 
 ### 📄 License
 
