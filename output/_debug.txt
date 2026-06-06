@@ -1,0 +1,16 @@
+function colorFromW(w) {
+      const t = (w + 2) / 4;
+      const r = Math.round(40 + 215 * t);
+      const g = Math.round(80 + 60 * (1 - Math.abs(t - 0.5) * 2));
+      const b = Math.round(220 - 180 * t);
+      return new THREE.Color(r/255, g/255, b/255);
+    }
+
+    // 4D 旋转：在 XY、XW、YZ、YW 平面上旋转
+    let rotAngleXY = 0, rotAngleXW = 0, rotAngleYZ = 0, rotAngleYW = 0;
+    function rotate4D(v, aXY, aXW, aYZ, aYW) {
+      let [x,y,z,w] = v;
+      const c1=Math.cos(aXY), s1=Math.sin(aXY);
+      let x1=c1*x-s1*y, y1=s1*x+c1*y;
+      const c2=Math.cos(aYZ), s2=Math.sin(aYZ);
+      let z1=c2*z-s2*w, w

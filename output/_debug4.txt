@@ -1,0 +1,47 @@
+=== rebuild4DGeometry ===
+ {
+      while (g4d.children.length > 0) {
+        const child = g4d.children[0];
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) child.material.dispose();
+        g4d.remove(child);
+      }
+      const rotated = tesseractVerts4D.map(v => rotate4D(v, rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW));
+      const pts3D = rotated.map(v => project4DTo3D(v, 3.5));
+      const edgeMat = new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:0.9});  // 深灰，浅色背景最醒目
+      for (const [i,j] of tesseractEdges) {
+        const geo = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(pts3D[i][0], pts3D[i][1], pts3D[i][2]),
+          new THREE.Vector3(pts3D[j][0], pts3D[j][1], pts3D[j][2])
+        ]);
+        const line = new THREE.Line(geo, edgeMat.clone());
+        g4d.add(line);
+      }
+      for (let i = 0; i < rotated.length; i++) {
+        const w = rotated[i][3];
+        const c = colorFromW(w);
+        const dot = new THREE.Mesh(
+          new THREE.SphereGeometry(0.12, 10, 10),
+          new THREE.MeshPhongMaterial({color:c, emissive:c.clone().multiplyScalar(0.3), shininess:80})
+        );
+        dot.position.set(pts3D[i][0], pts3D[i][1], pts3D[i][2]);
+        g4d.add(dot);
+      }
+      // 4D 基向量箭头
+      const bases = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+      const bColors = [0xff3333, 0x33cc55, 0x3366ff, 0xddaa00];
+      for (let i = 0; i < 4; i++) {
+        const rot = rotate4D(bases[i], rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW);
+        const p = project4DTo3D(rot, 3.5);
+        const len = Math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]) || 0.01;
+        g4d.add(new THREE.ArrowHelper(
+          new THREE.Vector3(p[0]/len, p[1]/len, p[2]/len),
+          new THREE.Vector3(0,0,0), len*1.5, bColors[i], 0.18, 0.1
+        ));
+      }
+      // S^3 切片（3D 球面）
+      g4d.add(new THREE.Mesh(
+        new THREE.SphereGeometry(1.0, 20, 16),
+        new THREE.MeshBasicMaterial({color:0x8844cc, wireframe:true, transparent:true, opacity:0.12})
+      ));
+    }

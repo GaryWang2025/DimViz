@@ -546,12 +546,12 @@ function build3D() {
     }
 
     // 根据 w 坐标生成颜色（蓝→红渐变）
+    // w 颜色映射：蓝(Blue) -> 紫(Purple) -> 红(Red)
+    // 色相 240->360->0，完全绕过黄/绿，在浅色背景上极醒目
     function colorFromW(w) {
-      const t = (w + 2) / 4;
-      const r = Math.round(40 + 215 * t);
-      const g = Math.round(80 + 60 * (1 - Math.abs(t - 0.5) * 2));
-      const b = Math.round(220 - 180 * t);
-      return new THREE.Color(r/255, g/255, b/255);
+      const t = (w + 2) / 4;  // t in [0,1]
+      const hue = (240 + 120 * t) % 360;  // 240(蓝) -> 300(紫) -> 0(红)
+      return new THREE.Color().setHSL(hue / 360, 1.0, 0.62);
     }
 
     // 4D 旋转：在 XY、XW、YZ、YW 平面上旋转
@@ -583,7 +583,7 @@ function build3D() {
       }
       const rotated = tesseractVerts4D.map(v => rotate4D(v, rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW));
       const pts3D = rotated.map(v => project4DTo3D(v, 3.5));
-      const edgeMat = new THREE.LineBasicMaterial({color:0x4466dd, transparent:true, opacity:0.5});
+      const edgeMat = new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:0.9});  // 深灰，浅色背景最醒目
       for (const [i,j] of tesseractEdges) {
         const geo = new THREE.BufferGeometry().setFromPoints([
           new THREE.Vector3(pts3D[i][0], pts3D[i][1], pts3D[i][2]),
