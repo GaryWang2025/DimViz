@@ -1,154 +1,259 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DimViz V002 | Dimension Visualizer 4D</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DimViz V003 | Dimension Visualizer 4D</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
     onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
   <style>
+    /* ══════════════════════════════════════════
+       CSS Variables — Light & Dark theme tokens
+    ══════════════════════════════════════════ */
+    :root {
+      --bg-page:        #f0f4ff;
+      --bg-header:      linear-gradient(90deg, #1e2a6e, #2d3b9e);
+      --bg-panel:       #ffffff;
+      --bg-controls:    #e8eeff;
+      --bg-formula:     #f5f8ff;
+      --border-panel:   #c8d4f0;
+      --border-formula: #d0dcf8;
+      --border-controls:#c0ccf0;
+      --text-main:      #1a2050;
+      --text-header:    #c8d8ff;
+      --text-sub:       #8898cc;
+      --text-label:     #5060a0;
+      --text-h3:        #3050b0;
+      --text-defTitle:  #1a3090;
+      --text-desc:      #4a5a90;
+      --btn-bg:         #ffffff;
+      --btn-border:     #a0b0e0;
+      --btn-color:      #2535a0;
+      --btn-hover-bg:   #dce8ff;
+      --btn-hover-bdr:  #4060d0;
+      --btn-active-bg:  #2535a0;
+      --btn-active-bdr: #1020a0;
+      --btn-active-col: #ffffff;
+      --divider:        #b0c0e0;
+      --hint-bg:        rgba(220,232,255,0.95);
+      --hint-border:    #6080d0;
+      --hint-color:     #3050a0;
+      --scene-bg:       0xeef2ff;
+      --badge-color:    rgba(30,60,180,0.12);
+      --progress-bg:    #c8d8ff;
+    }
+    [data-theme="dark"] {
+      --bg-page:        #0d1117;
+      --bg-header:      linear-gradient(90deg, #0d1630, #121e50);
+      --bg-panel:       #161b2e;
+      --bg-controls:    #111827;
+      --bg-formula:     #1a2040;
+      --border-panel:   #2a3560;
+      --border-formula: #2535558;
+      --border-controls:#1e2a50;
+      --text-main:      #c8d8ff;
+      --text-header:    #a0beff;
+      --text-sub:       #5a7ad0;
+      --text-label:     #6a80c0;
+      --text-h3:        #7090e0;
+      --text-defTitle:  #90b0ff;
+      --text-desc:      #6080b0;
+      --btn-bg:         #1e2a45;
+      --btn-border:     #304070;
+      --btn-color:      #8ab0ff;
+      --btn-hover-bg:   #253050;
+      --btn-hover-bdr:  #5070c0;
+      --btn-active-bg:  #3050b0;
+      --btn-active-bdr: #2040a0;
+      --btn-active-col: #ffffff;
+      --divider:        #2a3860;
+      --hint-bg:        rgba(20,30,60,0.95);
+      --hint-border:    #4060b0;
+      --hint-color:     #90b0ff;
+      --scene-bg:       0x0d1117;
+      --badge-color:    rgba(80,140,255,0.08);
+      --progress-bg:    #2535558;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       font-family: 'Segoe UI', 'PingFang SC', sans-serif;
-      background: #f0f4ff;
-      color: #1a2050;
+      background: var(--bg-page);
+      color: var(--text-main);
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
+      transition: background 0.3s, color 0.3s;
     }
+
+    /* ── Header ── */
     #header {
-      padding: 10px 20px;
-      background: linear-gradient(90deg, #1e2a6e, #2d3b9e);
-      border-bottom: 1px solid #1a2060;
+      padding: 8px 18px;
+      background: var(--bg-header);
+      border-bottom: 1px solid rgba(0,0,50,0.2);
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
+      flex-shrink: 0;
     }
     #header h1 {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
-      color: #c8d8ff;
+      color: var(--text-header);
       letter-spacing: 0.05em;
     }
     #header .subtitle {
-      font-size: 0.78rem;
-      color: #8898cc;
+      font-size: 0.76rem;
+      color: var(--text-sub);
     }
+    /* Header right-side tools */
+    #header-tools {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      padding: 5px 11px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      color: #c8d8ff;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .icon-btn:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    /* ── Main layout ── */
     #main {
       display: flex;
       flex: 1;
       overflow: hidden;
+      min-height: 0;
     }
     #canvas-wrap {
       flex: 1;
       position: relative;
+      min-width: 0;
     }
     canvas { display: block; width: 100% !important; height: 100% !important; }
 
-    /* 维度标签浮层 */
+    /* ── Dim Badge ── */
     #dim-badge {
       position: absolute;
-      top: 16px;
-      left: 16px;
+      top: 14px;
+      left: 14px;
       font-size: 3rem;
       font-weight: 900;
-      color: rgba(30, 60, 180, 0.12);
+      color: var(--badge-color);
       pointer-events: none;
       letter-spacing: 0.1em;
       transition: all 0.5s;
       user-select: none;
     }
 
-    /* 右侧公式面板 */
+    /* ── Formula Panel ── */
     #formula-panel {
-      width: 340px;
-      background: #ffffff;
-      border-left: 1px solid #c8d4f0;
-      padding: 20px 18px;
+      width: 330px;
+      background: var(--bg-panel);
+      border-left: 1px solid var(--border-panel);
+      padding: 18px 16px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
+      transition: background 0.3s, border-color 0.3s;
+      flex-shrink: 0;
     }
     .formula-section {
-      background: #f5f8ff;
-      border: 1px solid #d0dcf8;
+      background: var(--bg-formula);
+      border: 1px solid var(--border-formula);
       border-radius: 8px;
       padding: 14px;
       display: none;
+      transition: background 0.3s, border-color 0.3s;
     }
     .formula-section.active { display: block; }
     .formula-section h3 {
-      font-size: 0.82rem;
-      color: #3050b0;
+      font-size: 0.8rem;
+      color: var(--text-h3);
       text-transform: uppercase;
       letter-spacing: 0.1em;
       margin-bottom: 10px;
     }
     .formula-section .def-title {
-      font-size: 0.95rem;
-      color: #1a3090;
+      font-size: 0.93rem;
+      color: var(--text-defTitle);
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       margin-top: 12px;
     }
     .formula-section .desc {
-      font-size: 0.78rem;
-      color: #4a5a90;
+      font-size: 0.77rem;
+      color: var(--text-desc);
       line-height: 1.5;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
-    .katex-display { margin: 6px 0 !important; overflow-x: auto; }
-    .katex { font-size: 0.9rem; color: #1a2060; }
+    .katex-display { margin: 5px 0 !important; overflow-x: auto; }
+    .katex { font-size: 0.88rem; color: var(--text-defTitle); }
+    .katex-block { overflow-x: auto; padding: 2px 0; }
 
-    /* 底部控制栏 */
+    /* ── Controls Bar ── */
     #controls {
-      background: #e8eeff;
-      border-top: 1px solid #c0ccf0;
-      padding: 10px 20px;
+      background: var(--bg-controls);
+      border-top: 1px solid var(--border-controls);
+      padding: 8px 18px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
+      flex-shrink: 0;
+      transition: background 0.3s, border-color 0.3s;
     }
     .ctrl-group {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       align-items: center;
     }
     .ctrl-label {
-      font-size: 0.75rem;
-      color: #5060a0;
-      margin-right: 4px;
+      font-size: 0.73rem;
+      color: var(--text-label);
+      margin-right: 2px;
     }
     button {
-      padding: 6px 16px;
-      border: 1px solid #a0b0e0;
+      padding: 5px 14px;
+      border: 1px solid var(--btn-border);
       border-radius: 6px;
-      background: #ffffff;
-      color: #2535a0;
-      font-size: 0.82rem;
+      background: var(--btn-bg);
+      color: var(--btn-color);
+      font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.2s;
+      white-space: nowrap;
     }
-    button:hover { background: #dce8ff; border-color: #4060d0; color: #1020a0; }
+    button:hover { background: var(--btn-hover-bg); border-color: var(--btn-hover-bdr); }
     button.active {
-      background: #2535a0;
-      border-color: #1020a0;
-      color: #ffffff;
+      background: var(--btn-active-bg);
+      border-color: var(--btn-active-bdr);
+      color: var(--btn-active-col);
     }
-    .divider { width: 1px; height: 24px; background: #b0c0e0; }
+    .divider { width: 1px; height: 22px; background: var(--divider); flex-shrink: 0; }
 
-    /* 进度条 */
+    /* ── Progress bar ── */
     #progress-wrap {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       height: 3px;
-      background: #c8d8ff;
+      background: var(--progress-bg);
     }
     #progress-bar {
       height: 100%;
@@ -157,222 +262,457 @@
       transition: width 0.1s linear;
     }
 
-    /* 动画演示提示 */
-    #demo-hint {
+    /* ── Hints ── */
+    .canvas-hint {
       position: absolute;
-      bottom: 14px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(220,232,255,0.95);
-      border: 1px solid #6080d0;
+      background: var(--hint-bg);
+      border: 1px solid var(--hint-border);
       border-radius: 20px;
-      padding: 6px 18px;
-      font-size: 0.78rem;
-      color: #3050a0;
+      padding: 5px 16px;
+      font-size: 0.76rem;
+      color: var(--hint-color);
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.4s;
+      white-space: nowrap;
     }
-    #demo-hint.show { opacity: 1; }
-    #hint-4d {
+    .canvas-hint.show { opacity: 1; }
+    #demo-hint   { bottom: 14px; }
+    #hint-4d     { bottom: 46px; }
+
+    /* ── Slice panel ── */
+    #slice-panel {
       position: absolute;
-      bottom: 50px;
+      top: 12px;
+      right: 12px;
+      background: var(--hint-bg);
+      border: 1px solid var(--hint-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 0.78rem;
+      color: var(--hint-color);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 200px;
+      backdrop-filter: blur(4px);
+    }
+    #slice-panel.show { display: flex; }
+    #slice-panel label { font-weight: 600; margin-bottom: 2px; }
+    #slice-slider {
+      width: 100%;
+      accent-color: #5080f0;
+    }
+    #slice-info {
+      font-size: 0.72rem;
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    /* ── Unfold progress panel ── */
+    #unfold-panel {
+      position: absolute;
+      top: 12px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(220,240,255,0.95);
-      border: 1px solid #6080d0;
-      border-radius: 20px;
-      padding: 6px 18px;
+      background: var(--hint-bg);
+      border: 1px solid var(--hint-border);
+      border-radius: 12px;
+      padding: 8px 18px;
       font-size: 0.78rem;
-      color: #3050a0;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s;
+      color: var(--hint-color);
+      display: none;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
     }
-    #hint-4d.show { opacity: 1; }
-    #hint-4d {
-      position: absolute;
-      bottom: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(220,232,255,0.95);
-      border: 1px solid #6080d0;
-      border-radius: 20px;
-      padding: 6px 18px;
-      font-size: 0.78rem;
-      color: #3050a0;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s;
+    #unfold-panel.show { display: flex; }
+    #unfold-progress {
+      width: 120px;
+      height: 4px;
+      background: rgba(100,140,255,0.3);
+      border-radius: 2px;
+      overflow: hidden;
     }
-    #hint-4d.show { opacity: 1; }
-    .katex-block { overflow-x: auto; padding: 2px 0; }
+    #unfold-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg,#4499ff,#aa44ff);
+      transition: width 0.1s;
+    }
   </style>
 </head>
 <body>
+
+<!-- ═══════════════ Header ═══════════════ -->
 <div id="header">
-  <h1>DimViz <span style='font-size:0.7rem;opacity:0.7;'>V002 &middot; 4D</span></h1>
+  <h1>DimViz <span style="font-size:0.68rem;opacity:0.6">V003 &middot; 4D</span></h1>
   <span class="subtitle">Dimension Visualizer — ℝ¹ → ℝ² → ℝ³ → ℝ⁴</span>
+  <div id="header-tools">
+    <!-- Screenshot -->
+    <button class="icon-btn" id="btn-screenshot" onclick="takeScreenshot()" title="Save PNG snapshot">📷 <span data-i18n="screenshot">Screenshot</span></button>
+    <!-- Dark mode -->
+    <button class="icon-btn" id="btn-theme" onclick="toggleTheme()" title="Toggle dark/light mode">🌙 <span data-i18n="darkMode">Dark Mode</span></button>
+    <!-- Language -->
+    <button class="icon-btn" id="btn-lang" onclick="toggleLang()" title="切换语言 / Switch language">🌐 中文</button>
+  </div>
 </div>
+
+<!-- ═══════════════ Main ═══════════════ -->
 <div id="main">
   <div id="canvas-wrap">
     <canvas id="c"></canvas>
     <div id="dim-badge">3D</div>
+
+    <!-- Progress bar -->
     <div id="progress-wrap"><div id="progress-bar"></div></div>
-    <div id="demo-hint">Auto demo in progress…</div>
-    <div id="hint-4d">4D rotation active…</div>
+
+    <!-- Hints -->
+    <div class="canvas-hint" id="demo-hint"><span data-i18n="demoHint">Auto demo in progress…</span></div>
+    <div class="canvas-hint" id="hint-4d"><span data-i18n="rotate4dHint">4D rotation active…</span></div>
+
+    <!-- Slice controls (4D only) -->
+    <div id="slice-panel">
+      <label data-i18n="sliceTitle">4D Slice Mode (W-axis)</label>
+      <input type="range" id="slice-slider" min="-200" max="200" value="0" oninput="onSliceChange(this.value)">
+      <div id="slice-info">w = 0.00</div>
+    </div>
+
+    <!-- Unfold progress -->
+    <div id="unfold-panel">
+      <span data-i18n="unfoldLabel">Unfolding</span>
+      <div id="unfold-progress"><div id="unfold-bar"></div></div>
+      <span id="unfold-pct">0%</span>
+    </div>
   </div>
 
+  <!-- ═══════════════ Formula Panel ═══════════════ -->
   <div id="formula-panel">
 
-    <!-- 1D 公式 -->
+    <!-- 1D -->
     <div class="formula-section" id="sec-1d">
-      <h3>ℝ¹ · One-Dimensional Space</h3>
+      <h3 data-i18n="h3_1d">ℝ¹ · One-Dimensional Space</h3>
 
-      <div class="def-title">Space Definition</div>
-      <div class="desc">A one-dimensional vector space over the real numbers ℝ, the set of all real numbers.</div>
+      <div class="def-title" data-i18n="spaceDef">Space Definition</div>
+      <div class="desc" data-i18n="desc_1d_space">A one-dimensional vector space over the real numbers ℝ, the set of all real numbers.</div>
       <div class="katex-block">$$\mathbb{R}^1 = \{x \mid x \in \mathbb{R}\}$$</div>
 
-      <div class="def-title">Basis</div>
-      <div class="desc">The unique basis vector $\mathbf{e}_1$; any vector is a scalar multiple of it.</div>
+      <div class="def-title" data-i18n="basis">Basis</div>
+      <div class="desc" data-i18n="desc_1d_basis">The unique basis vector $\mathbf{e}_1$; any vector is a scalar multiple of it.</div>
       <div class="katex-block">$$\mathbf{e}_1 = (1) \quad \dim(\mathbb{R}^1) = 1$$</div>
       <div class="katex-block">$$\mathbf{x} = x_1 \mathbf{e}_1, \quad x_1 \in \mathbb{R}$$</div>
 
-      <div class="def-title">Norm</div>
-      <div class="desc">A measure of vector length satisfying positivity, homogeneity, and the triangle inequality.</div>
+      <div class="def-title" data-i18n="norm">Norm</div>
+      <div class="desc" data-i18n="desc_1d_norm">A measure of vector length satisfying positivity, homogeneity, and the triangle inequality.</div>
       <div class="katex-block">$$\|\mathbf{x}\| = |x_1|$$</div>
 
-      <div class="def-title">线性映射 $T: \mathbb{R}^1 \to \mathbb{R}^1$</div>
+      <div class="def-title" data-i18n="linMap1d">Linear Map $T: \mathbb{R}^1 \to \mathbb{R}^1$</div>
       <div class="katex-block">$$T(x) = ax, \quad a \in \mathbb{R}$$</div>
     </div>
 
-    <!-- 2D 公式 -->
+    <!-- 2D -->
     <div class="formula-section" id="sec-2d">
-      <h3>ℝ² · Two-Dimensional Space</h3>
+      <h3 data-i18n="h3_2d">ℝ² · Two-Dimensional Space</h3>
 
-      <div class="def-title">Space Definition</div>
-      <div class="desc">The set of all ordered pairs of real numbers with addition and scalar multiplication.</div>
+      <div class="def-title" data-i18n="spaceDef">Space Definition</div>
+      <div class="desc" data-i18n="desc_2d_space">The set of all ordered pairs of real numbers with addition and scalar multiplication.</div>
       <div class="katex-block">$$\mathbb{R}^2 = \{(x_1, x_2) \mid x_1, x_2 \in \mathbb{R}\}$$</div>
 
-      <div class="def-title">Standard Orthonormal Basis</div>
+      <div class="def-title" data-i18n="stdBasis">Standard Orthonormal Basis</div>
       <div class="katex-block">$$\mathbf{e}_1 = \begin{pmatrix}1\\0\end{pmatrix},\quad \mathbf{e}_2 = \begin{pmatrix}0\\1\end{pmatrix}$$</div>
       <div class="katex-block">$$\mathbf{x} = x_1\mathbf{e}_1 + x_2\mathbf{e}_2, \quad \dim(\mathbb{R}^2)=2$$</div>
 
-      <div class="def-title">Euclidean Norm</div>
+      <div class="def-title" data-i18n="euclidNorm">Euclidean Norm</div>
       <div class="katex-block">$$\|\mathbf{x}\|_2 = \sqrt{x_1^2 + x_2^2}$$</div>
 
-      <div class="def-title">线性变换 $A: \mathbb{R}^2 \to \mathbb{R}^2$</div>
+      <div class="def-title" data-i18n="linTransform2d">Linear Transform $A: \mathbb{R}^2 \to \mathbb{R}^2$</div>
       <div class="katex-block">$$A = \begin{pmatrix}a & b \\ c & d\end{pmatrix},\quad \det(A) = ad - bc$$</div>
 
-      <div class="def-title">Rotation Matrix</div>
+      <div class="def-title" data-i18n="rotMatrix">Rotation Matrix</div>
       <div class="katex-block">$$R(\theta) = \begin{pmatrix}\cos\theta & -\sin\theta \\ \sin\theta & \cos\theta\end{pmatrix}$$</div>
     </div>
 
-    <!-- 3D 公式 -->
+    <!-- 3D -->
     <div class="formula-section" id="sec-3d">
-      <h3>ℝ³ · Three-Dimensional Space</h3>
+      <h3 data-i18n="h3_3d">ℝ³ · Three-Dimensional Space</h3>
 
-      <div class="def-title">Space Definition</div>
+      <div class="def-title" data-i18n="spaceDef">Space Definition</div>
       <div class="katex-block">$$\mathbb{R}^3 = \{(x_1,x_2,x_3) \mid x_i \in \mathbb{R}\}$$</div>
 
-      <div class="def-title">Standard Orthonormal Basis</div>
+      <div class="def-title" data-i18n="stdBasis">Standard Orthonormal Basis</div>
       <div class="katex-block">$$\mathbf{e}_1=\begin{pmatrix}1\\0\\0\end{pmatrix},\ \mathbf{e}_2=\begin{pmatrix}0\\1\\0\end{pmatrix},\ \mathbf{e}_3=\begin{pmatrix}0\\0\\1\end{pmatrix}$$</div>
       <div class="katex-block">$$\mathbf{v} = v_1\mathbf{e}_1 + v_2\mathbf{e}_2 + v_3\mathbf{e}_3$$</div>
 
-      <div class="def-title">Euclidean Norm</div>
+      <div class="def-title" data-i18n="euclidNorm">Euclidean Norm</div>
       <div class="katex-block">$$\|\mathbf{v}\|_2 = \sqrt{v_1^2 + v_2^2 + v_3^2}$$</div>
 
-      <div class="def-title">Inner Product (Dot Product)</div>
+      <div class="def-title" data-i18n="innerProduct">Inner Product (Dot Product)</div>
       <div class="katex-block">$$\mathbf{u}\cdot\mathbf{v} = \sum_{i=1}^{3} u_i v_i = \|\mathbf{u}\|\|\mathbf{v}\|\cos\theta$$</div>
 
-      <div class="def-title">Cross Product</div>
+      <div class="def-title" data-i18n="crossProduct">Cross Product</div>
       <div class="katex-block">$$\mathbf{u}\times\mathbf{v} = \det\begin{pmatrix}\mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \\ u_1 & u_2 & u_3 \\ v_1 & v_2 & v_3\end{pmatrix}$$</div>
 
-      <div class="def-title">线性变换 $A \in \mathbb{R}^{3\times 3}$</div>
+      <div class="def-title" data-i18n="eigenvalue">Eigenvalue Equation</div>
       <div class="katex-block">$$A\mathbf{v} = \lambda\mathbf{v} \implies \det(A - \lambda I) = 0$$</div>
 
-      <div class="def-title">Unit Sphere</div>
+      <div class="def-title" data-i18n="unitSphere">Unit Sphere</div>
       <div class="katex-block">$$S^2 = \{\mathbf{v}\in\mathbb{R}^3 \mid \|\mathbf{v}\|=1\}$$</div>
     </div>
-    <!-- 4D 公式（新增） -->
+
+    <!-- 4D -->
     <div class="formula-section" id="sec-4d">
-      <h3>ℝ⁴ · Four-Dimensional Space</h3>
-      <div class="def-title">Space Definition</div>
-      <div class="desc">Ordered 4-tuples of independent real coordinates. Cannot be directly perceived visually; understood through projection and analogy.</div>
+      <h3 data-i18n="h3_4d">ℝ⁴ · Four-Dimensional Space</h3>
+
+      <div class="def-title" data-i18n="spaceDef">Space Definition</div>
+      <div class="desc" data-i18n="desc_4d_space">Ordered 4-tuples of independent real coordinates. Cannot be directly perceived visually; understood through projection and analogy.</div>
       <div class="katex-block">$$\mathbb{R}^4 = \{(x_1,x_2,x_3,x_4) \mid x_i \in \mathbb{R}\}$$</div>
-      <div class="def-title">Standard Orthonormal Basis</div>
-      <div class="katex-block">$$\mathbf{e}_1=egin{pmatrix}1\0\0\0\end{pmatrix},\mathbf{e}_2=egin{pmatrix}0\1\0\0\end{pmatrix}$$</div>
-      <div class="katex-block">$$\mathbf{e}_3=egin{pmatrix}0\0\1\0\end{pmatrix},\mathbf{e}_4=egin{pmatrix}0\0\0\1\end{pmatrix}$$</div>
+
+      <div class="def-title" data-i18n="stdBasis">Standard Orthonormal Basis</div>
+      <div class="katex-block">$$\mathbf{e}_1=\begin{pmatrix}1\\0\\0\\0\end{pmatrix},\mathbf{e}_2=\begin{pmatrix}0\\1\\0\\0\end{pmatrix},\mathbf{e}_3=\begin{pmatrix}0\\0\\1\\0\end{pmatrix},\mathbf{e}_4=\begin{pmatrix}0\\0\\0\\1\end{pmatrix}$$</div>
       <div class="katex-block">$$\dim(\mathbb{R}^4) = 4$$</div>
-      <div class="def-title">Euclidean Norm</div>
+
+      <div class="def-title" data-i18n="euclidNorm">Euclidean Norm</div>
       <div class="katex-block">$$\|\mathbf{v}\|_2 = \sqrt{v_1^2 + v_2^2 + v_3^2 + v_4^2}$$</div>
-      <div class="def-title">Inner Product</div>
-      <div class="katex-block">$$\langle \mathbf{u}, \mathbf{v} 
-angle = \sum_{i=1}^{4} u_i v_i$$</div>
-      <div class="def-title">4D Rotation Matrix $SO(4)$</div>
-      <div class="desc">4D 中的旋转发生在两个坐标平面（如 $xy, xw, yw$ 等），共 6 total独立旋转平面。</div>
-      <div class="katex-block">$$R_{xw}(	heta) = egin{pmatrix}\cos	heta & 0 & 0 & -\sin	heta \ 0&1&0&0 \ 0&0&1&0 \ \sin	heta & 0 & 0 & \cos	heta\end{pmatrix}$$</div>
-      <div class="def-title">Hypercube (Tesseract)</div>
-      <div class="desc">The 4D analog of a cube: 8 cubic cells, 24 square faces, 32 edges, and 16 vertices.</div>
-      <div class="katex-block">$$	ext{Vertices:} (\pm 1, \pm 1, \pm 1, \pm 1) \quad (16 	ext{ total})$$</div>
-      <div class="def-title">单位超球面 $S^3$</div>
-      <div class="desc">The set of points in ℝ⁴ at distance 1 from the origin (a 3-dimensional hypersphere).</div>
+
+      <div class="def-title" data-i18n="innerProduct">Inner Product</div>
+      <div class="katex-block">$$\langle \mathbf{u}, \mathbf{v} \rangle = \sum_{i=1}^{4} u_i v_i$$</div>
+
+      <div class="def-title" data-i18n="rot4d">4D Rotation Matrix SO(4)</div>
+      <div class="desc" data-i18n="desc_4d_rot">4D rotation occurs in planes (e.g. $xy, xw, yw$). There are 6 independent rotation planes.</div>
+      <div class="katex-block">$$R_{xw}(\theta) = \begin{pmatrix}\cos\theta & 0 & 0 & -\sin\theta \\ 0&1&0&0 \\ 0&0&1&0 \\ \sin\theta & 0 & 0 & \cos\theta\end{pmatrix}$$</div>
+
+      <div class="def-title" data-i18n="tesseract">Hypercube (Tesseract)</div>
+      <div class="desc" data-i18n="desc_tesseract">The 4D analog of a cube: 8 cubic cells, 24 square faces, 32 edges, and 16 vertices.</div>
+      <div class="katex-block">$$\text{Vertices: } (\pm 1, \pm 1, \pm 1, \pm 1) \quad (16 \text{ total})$$</div>
+
+      <div class="def-title" data-i18n="hyperSphere">Unit Hypersphere $S^3$</div>
+      <div class="desc" data-i18n="desc_s3">The set of points in ℝ⁴ at distance 1 from the origin (a 3-dimensional hypersphere).</div>
       <div class="katex-block">$$S^3 = \{\mathbf{v} \in \mathbb{R}^4 \mid \|\mathbf{v}\| = 1\}$$</div>
-      <div class="katex-block">$$	ext{Hypervolume}(S^3) = 2\pi^2$$</div>
+      <div class="katex-block">$$\text{Hypervolume}(S^3) = 2\pi^2$$</div>
     </div>
 
+  </div><!-- /formula-panel -->
+</div><!-- /main -->
 
-  </div>
-</div>
-
+<!-- ═══════════════ Controls Bar ═══════════════ -->
 <div id="controls">
-  <span class="ctrl-label">Dimension:</span>
+  <span class="ctrl-label" data-i18n="dimensionLabel">Dimension:</span>
   <div class="ctrl-group">
     <button id="btn-1d" onclick="setDim(1)">1D</button>
     <button id="btn-2d" onclick="setDim(2)">2D</button>
     <button id="btn-3d" onclick="setDim(3)">3D</button>
     <button id="btn-4d" onclick="setDim(4)">4D</button>
-    <button id="btn-4d-rotate" onclick="toggle4DRotate()">⟳ 4D Rotate</button>
+    <button id="btn-4d-rotate" onclick="toggle4DRotate()">⟳ <span data-i18n="rotate4d">4D Rotate</span></button>
   </div>
   <div class="divider"></div>
   <div class="ctrl-group">
-    <button id="btn-demo" onclick="toggleDemo()">▶ Auto Demo</button>
+    <button id="btn-demo" onclick="toggleDemo()">▶ <span data-i18n="autoDemo">Auto Demo</span></button>
   </div>
   <div class="divider"></div>
   <div class="ctrl-group">
-    <button id="btn-rotate" class="active" onclick="toggleAutoRotate()">⟳ Auto Rotate</button>
+    <button id="btn-rotate" class="active" onclick="toggleAutoRotate()">⟳ <span data-i18n="autoRotate">Auto Rotate</span></button>
+  </div>
+  <div class="divider"></div>
+  <!-- NEW V003 buttons -->
+  <div class="ctrl-group">
+    <button id="btn-unfold" onclick="toggleUnfold()">📦 <span data-i18n="unfoldBtn">Unfold</span></button>
+    <button id="btn-slice" onclick="toggleSlice()">🔪 <span data-i18n="sliceBtn">Slice</span></button>
   </div>
   <div class="divider"></div>
   <div class="ctrl-group">
-    <button onclick="resetCamera()">↺ Reset View</button>
+    <button onclick="resetCamera()">↺ <span data-i18n="resetView">Reset View</span></button>
   </div>
-  <span class="ctrl-label" style="margin-left:auto;font-size:0.7rem;color:#3a4060">拖动旋转 · 滚轮缩放</span>
+  <span class="ctrl-label" style="margin-left:auto;font-size:0.68rem;opacity:0.7" data-i18n="dragHint">Drag to rotate · Scroll to zoom</span>
 </div>
 
-<!-- Three.js r128 (stable, includes OrbitControls in examples/js) -->
+<!-- Three.js -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-// ─────────────── Three.js Scene Setup ───────────────
-const canvas = document.getElementById('c');
-const wrap = document.getElementById('canvas-wrap');
+/* ═══════════════════════════════════════════════
+   i18n — language strings
+═══════════════════════════════════════════════ */
+const I18N = {
+  en: {
+    screenshot: 'Screenshot',
+    darkMode:   'Dark Mode',
+    lightMode:  'Light Mode',
+    demoHint:   'Auto demo in progress…',
+    rotate4dHint:'4D rotation active…',
+    sliceTitle: '4D Slice Mode (W-axis)',
+    unfoldLabel:'Unfolding',
+    dimensionLabel:'Dimension:',
+    rotate4d:   '4D Rotate',
+    autoDemo:   'Auto Demo',
+    autoRotate: 'Auto Rotate',
+    unfoldBtn:  'Unfold',
+    sliceBtn:   'Slice',
+    resetView:  'Reset View',
+    dragHint:   'Drag to rotate · Scroll to zoom',
+    stopDemo:   'Stop Demo',
+    h3_1d: 'ℝ¹ · One-Dimensional Space',
+    h3_2d: 'ℝ² · Two-Dimensional Space',
+    h3_3d: 'ℝ³ · Three-Dimensional Space',
+    h3_4d: 'ℝ⁴ · Four-Dimensional Space',
+    spaceDef:   'Space Definition',
+    basis:      'Basis',
+    norm:       'Norm',
+    linMap1d:   'Linear Map T: ℝ¹ → ℝ¹',
+    stdBasis:   'Standard Orthonormal Basis',
+    euclidNorm: 'Euclidean Norm',
+    linTransform2d: 'Linear Transform A: ℝ² → ℝ²',
+    rotMatrix:  'Rotation Matrix',
+    innerProduct: 'Inner Product (Dot Product)',
+    crossProduct: 'Cross Product',
+    eigenvalue: 'Eigenvalue Equation',
+    unitSphere: 'Unit Sphere',
+    rot4d:      '4D Rotation Matrix SO(4)',
+    tesseract:  'Hypercube (Tesseract)',
+    hyperSphere:'Unit Hypersphere S³',
+    desc_1d_space: 'A one-dimensional vector space over the real numbers ℝ, the set of all real numbers.',
+    desc_1d_basis: 'The unique basis vector e₁; any vector is a scalar multiple of it.',
+    desc_1d_norm:  'A measure of vector length satisfying positivity, homogeneity, and the triangle inequality.',
+    desc_2d_space: 'The set of all ordered pairs of real numbers with addition and scalar multiplication.',
+    desc_4d_space: 'Ordered 4-tuples of independent real coordinates. Cannot be directly perceived visually; understood through projection and analogy.',
+    desc_4d_rot:   '4D rotation occurs in planes (e.g. xy, xw, yw). There are 6 independent rotation planes.',
+    desc_tesseract:'The 4D analog of a cube: 8 cubic cells, 24 square faces, 32 edges, and 16 vertices.',
+    desc_s3:       'The set of points in ℝ⁴ at distance 1 from the origin (a 3-dimensional hypersphere).',
+  },
+  zh: {
+    screenshot: '截图',
+    darkMode:   '深色模式',
+    lightMode:  '浅色模式',
+    demoHint:   '自动演示进行中…',
+    rotate4dHint:'4D旋转进行中…',
+    sliceTitle: '4D 切片模式（W轴）',
+    unfoldLabel:'展开中',
+    dimensionLabel:'维度：',
+    rotate4d:   '4D旋转',
+    autoDemo:   '自动演示',
+    autoRotate: '自动旋转',
+    unfoldBtn:  '展开',
+    sliceBtn:   '切片',
+    resetView:  '重置视角',
+    dragHint:   '拖动旋转 · 滚轮缩放',
+    stopDemo:   '停止演示',
+    h3_1d: 'ℝ¹ · 一维空间',
+    h3_2d: 'ℝ² · 二维空间',
+    h3_3d: 'ℝ³ · 三维空间',
+    h3_4d: 'ℝ⁴ · 四维空间',
+    spaceDef:   '空间定义',
+    basis:      '基底',
+    norm:       '范数',
+    linMap1d:   '线性映射 T: ℝ¹ → ℝ¹',
+    stdBasis:   '标准正交基',
+    euclidNorm: '欧氏范数',
+    linTransform2d: '线性变换 A: ℝ² → ℝ²',
+    rotMatrix:  '旋转矩阵',
+    innerProduct: '内积（点积）',
+    crossProduct: '叉积',
+    eigenvalue: '特征值方程',
+    unitSphere: '单位球面',
+    rot4d:      '4D旋转矩阵 SO(4)',
+    tesseract:  '超立方体（Tesseract）',
+    hyperSphere:'单位超球面 S³',
+    desc_1d_space: '实数域 ℝ 上的一维向量空间，即全体实数的集合。',
+    desc_1d_basis: '唯一的基向量 e₁，任何向量都是它的标量倍数。',
+    desc_1d_norm:  '满足正定性、齐次性和三角不等式的向量长度度量。',
+    desc_2d_space: '全体有序实数对的集合，配备加法和标量乘法运算。',
+    desc_4d_space: '4个独立实坐标的有序4元组。无法直接感知，需通过投影和类比理解。',
+    desc_4d_rot:   '4D空间中的旋转发生在坐标平面内（如 xy, xw, yw），共6个独立旋转平面。',
+    desc_tesseract:'立方体的4D类比：8个正方体胞腔，24个正方形面，32条棱，16个顶点。',
+    desc_s3:       'ℝ⁴中到原点距离为1的点的集合（一个3维超球面）。',
+  }
+};
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+let currentLang = 'en';
+
+function applyLang(lang) {
+  currentLang = lang;
+  const T = I18N[lang];
+  // Update all [data-i18n] elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (T[key] !== undefined) el.textContent = T[key];
+  });
+  // Language button label
+  document.getElementById('btn-lang').innerHTML = (lang === 'en')
+    ? '🌐 中文'
+    : '🌐 EN';
+  // Re-render formulas
+  if (window.renderMathInElement) {
+    setTimeout(() => renderMathInElement(document.getElementById('formula-panel'), {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
+    }), 80);
+  }
+  // Update stop-demo button if running
+  if (demoRunning) {
+    document.getElementById('btn-demo').innerHTML = '⏹ ' + T.stopDemo;
+  }
+}
+
+function toggleLang() {
+  applyLang(currentLang === 'en' ? 'zh' : 'en');
+}
+
+/* ═══════════════════════════════════════════════
+   Dark / Light Theme
+═══════════════════════════════════════════════ */
+let darkMode = false;
+function toggleTheme() {
+  darkMode = !darkMode;
+  document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : '');
+  renderer.setClearColor(darkMode ? 0x0d1117 : 0xeef2ff, 1);
+  const T = I18N[currentLang];
+  document.querySelector('#btn-theme [data-i18n="darkMode"], #btn-theme [data-i18n="lightMode"]').textContent =
+    darkMode ? T.lightMode : T.darkMode;
+  document.querySelector('#btn-theme [data-i18n]').setAttribute('data-i18n', darkMode ? 'lightMode' : 'darkMode');
+  document.getElementById('btn-theme').innerHTML = darkMode
+    ? '☀️ ' + '<span data-i18n="lightMode">' + T.lightMode + '</span>'
+    : '🌙 ' + '<span data-i18n="darkMode">' + T.darkMode + '</span>';
+}
+
+/* ═══════════════════════════════════════════════
+   Screenshot
+═══════════════════════════════════════════════ */
+function takeScreenshot() {
+  // Force one more render so preserveDrawingBuffer captures current frame
+  renderer.render(scene, camera);
+  const url = renderer.domElement.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dimviz-v003-' + Date.now() + '.png';
+  a.click();
+}
+
+/* ═══════════════════════════════════════════════
+   Three.js Scene Setup
+═══════════════════════════════════════════════ */
+const canvas = document.getElementById('c');
+const wrap   = document.getElementById('canvas-wrap');
+
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: true,
+  alpha: false,
+  preserveDrawingBuffer: true   // required for toDataURL screenshot
+});
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setClearColor(0xeef2ff, 1);
 
-const scene = new THREE.Scene();
+const scene  = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 200);
 camera.position.set(5, 4, 6);
 
 const controls = new THREE.OrbitControls(camera, canvas);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.autoRotate = true;
+controls.enableDamping   = true;
+controls.dampingFactor   = 0.08;
+controls.autoRotate      = true;
 controls.autoRotateSpeed = 1.2;
 
-// Resize
 function resize() {
   const w = wrap.clientWidth, h = wrap.clientHeight;
   renderer.setSize(w, h, false);
@@ -382,402 +722,463 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-// ─────────────── Geometry Groups ───────────────
+/* ─── Geometry groups ─── */
 const g1d = new THREE.Group();
 const g2d = new THREE.Group();
 const g3d = new THREE.Group();
 const g4d = new THREE.Group();
 scene.add(g1d, g2d, g3d, g4d);
 
-// Helper: Arrow
+/* ─── Helpers ─── */
 function makeArrow(dir, origin, length, color, headLen=0.18) {
   const d = new THREE.Vector3(...dir).normalize();
   return new THREE.ArrowHelper(d, new THREE.Vector3(...origin), length, color, headLen, 0.1);
 }
-
-// Helper: Dashed Line
 function dashedLine(pts, color=0x3a4060) {
-  const geo = new THREE.BufferGeometry().setFromPoints(pts.map(p=>new THREE.Vector3(...p)));
+  const geo = new THREE.BufferGeometry().setFromPoints(pts.map(p => new THREE.Vector3(...p)));
   const mat = new THREE.LineDashedMaterial({color, dashSize:0.15, gapSize:0.1, linewidth:1});
   const line = new THREE.Line(geo, mat);
   line.computeLineDistances();
   return line;
 }
 
-// ─── 1D ───
+/* ─── 1D ─── */
 function build1D() {
-  // Axis line
-  const pts = [new THREE.Vector3(-4,0,0), new THREE.Vector3(4,0,0)];
-  const geo = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat = new THREE.LineBasicMaterial({color:0xcc1133, linewidth:3});
-  g1d.add(new THREE.Line(geo, mat));
-
-  // Basis arrow
+  const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-4,0,0), new THREE.Vector3(4,0,0)]);
+  g1d.add(new THREE.Line(geo, new THREE.LineBasicMaterial({color:0xcc1133, linewidth:3})));
   g1d.add(makeArrow([1,0,0],[0,0,0],1.6,0xee2244));
-
-  // Ticks
   for(let i=-3;i<=3;i++) {
     if(i===0) continue;
-    const tickGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(i,-0.15,0),new THREE.Vector3(i,0.15,0)]);
-    g1d.add(new THREE.Line(tickGeo, new THREE.LineBasicMaterial({color:0xaa2244})));
+    const tg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(i,-0.15,0),new THREE.Vector3(i,0.15,0)]);
+    g1d.add(new THREE.Line(tg, new THREE.LineBasicMaterial({color:0xaa2244})));
   }
-
-  // Point on axis
   const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.14, 16, 16),
+    new THREE.SphereGeometry(0.14,16,16),
     new THREE.MeshPhongMaterial({color:0xff3366, emissive:0xcc0022, shininess:80})
   );
-  sphere.position.set(2.5, 0, 0);
+  sphere.position.set(2.5,0,0);
   g1d.userData.point = sphere;
   g1d.add(sphere);
 }
 
-// ─── 2D ───
+/* ─── 2D ─── */
 function build2D() {
-  // Grid — light blue lines on light background
-  const gridHelper = new THREE.GridHelper(8, 16, 0x90a8e8, 0xbccaf8);
-  gridHelper.rotation.x = Math.PI/2;
-  gridHelper.position.z = 0;
-  g2d.add(gridHelper);
-
-  // Axes
+  const gh = new THREE.GridHelper(8,16,0x90a8e8,0xbccaf8);
+  gh.rotation.x = Math.PI/2;
+  g2d.add(gh);
   g2d.add(makeArrow([1,0,0],[0,0,0],4.2,0xdd2222,0.22));
   g2d.add(makeArrow([0,1,0],[0,0,0],4.2,0x118833,0.22));
-
-  // Basis vectors (bold, orange & cyan)
   g2d.add(makeArrow([1,0,0],[0,0,0],1.0,0xff6600,0.18));
   g2d.add(makeArrow([0,1,0],[0,0,0],1.0,0x0088cc,0.18));
-
-  // Sample vector
   g2d.add(makeArrow([2,1.5,0],[0,0,0],2.6,0x6633cc,0.2));
-
-  // Projection dashes
-  g2d.add(dashedLine([[2,0,0],[2,1.5,0]], 0x8866bb));
-  g2d.add(dashedLine([[0,1.5,0],[2,1.5,0]], 0x8866bb));
-
-  // Sample point
-  const sp = new THREE.Mesh(
-    new THREE.SphereGeometry(0.12,16,16),
-    new THREE.MeshPhongMaterial({color:0x6633cc, emissive:0x3311aa, shininess:80})
-  );
-  sp.position.set(2,1.5,0);
-  g2d.add(sp);
-
-  // Origin dot
-  const orig = new THREE.Mesh(
-    new THREE.SphereGeometry(0.1,8,8),
-    new THREE.MeshPhongMaterial({color:0x222266, emissive:0x111133, shininess:60})
-  );
-  g2d.add(orig);
+  g2d.add(dashedLine([[2,0,0],[2,1.5,0]],0x8866bb));
+  g2d.add(dashedLine([[0,1.5,0],[2,1.5,0]],0x8866bb));
+  const sp = new THREE.Mesh(new THREE.SphereGeometry(0.12,16,16), new THREE.MeshPhongMaterial({color:0x6633cc,emissive:0x3311aa,shininess:80}));
+  sp.position.set(2,1.5,0); g2d.add(sp);
+  g2d.add(new THREE.Mesh(new THREE.SphereGeometry(0.1,8,8), new THREE.MeshPhongMaterial({color:0x222266,emissive:0x111133,shininess:60})));
 }
 
-// ─── 3D ───
+/* ─── 3D ─── */
 function build3D() {
-  // Axes — bold, saturated
   g3d.add(makeArrow([1,0,0],[0,0,0],4.5,0xdd2222,0.24));
   g3d.add(makeArrow([0,1,0],[0,0,0],4.5,0x119933,0.24));
   g3d.add(makeArrow([0,0,1],[0,0,0],4.5,0x1155ee,0.24));
-
-  // Basis vectors — vivid orange / green / blue
   g3d.add(makeArrow([1,0,0],[0,0,0],1.2,0xff5500,0.2));
   g3d.add(makeArrow([0,1,0],[0,0,0],1.2,0x00bb44,0.2));
   g3d.add(makeArrow([0,0,1],[0,0,0],1.2,0x0077ff,0.2));
-
-  // Unit sphere (wireframe) — visible on light bg
-  const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 32, 24),
-    new THREE.MeshBasicMaterial({color:0x4466cc, wireframe:true, transparent:true, opacity:0.3})
-  );
-  g3d.add(sphere);
-
-  // Sample vector
-  g3d.add(makeArrow([1,1.2,0.8],[0,0,0], 1.88, 0x9922dd, 0.22));
-
-  // Sample point on sphere
-  const tip = new THREE.Mesh(
-    new THREE.SphereGeometry(0.1,12,12),
-    new THREE.MeshPhongMaterial({color:0x9922dd, emissive:0x660099, shininess:90})
-  );
-  tip.position.set(1,1.2,0.8).normalize();
-  g3d.add(tip);
-
-  // Cross product plane hint
-  const planeGeo = new THREE.PlaneGeometry(2.2,2.2);
-  const planeMat = new THREE.MeshBasicMaterial({color:0x3366cc, side:THREE.DoubleSide, transparent:true, opacity:0.15});
-  const plane = new THREE.Mesh(planeGeo, planeMat);
-  plane.rotation.x = Math.PI/3.5;
-  plane.rotation.y = 0.4;
-  g3d.add(plane);
-
-  // Grid on XZ plane — soft blue lines
-  const grid = new THREE.GridHelper(8, 16, 0x8899cc, 0xb0c0e8);
-  g3d.add(grid);
-
-  // Tiny sphere at origin
-  const orig = new THREE.Mesh(
-    new THREE.SphereGeometry(0.12,8,8),
-    new THREE.MeshPhongMaterial({color:0x222255, emissive:0x111133, shininess:80})
-  );
-  g3d.add(orig);
+  g3d.add(new THREE.Mesh(new THREE.SphereGeometry(1,32,24), new THREE.MeshBasicMaterial({color:0x4466cc,wireframe:true,transparent:true,opacity:0.3})));
+  g3d.add(makeArrow([1,1.2,0.8],[0,0,0],1.88,0x9922dd,0.22));
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12), new THREE.MeshPhongMaterial({color:0x9922dd,emissive:0x660099,shininess:90}));
+  tip.position.set(1,1.2,0.8).normalize(); g3d.add(tip);
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(2.2,2.2), new THREE.MeshBasicMaterial({color:0x3366cc,side:THREE.DoubleSide,transparent:true,opacity:0.15}));
+  plane.rotation.x=Math.PI/3.5; plane.rotation.y=0.4; g3d.add(plane);
+  g3d.add(new THREE.GridHelper(8,16,0x8899cc,0xb0c0e8));
+  g3d.add(new THREE.Mesh(new THREE.SphereGeometry(0.12,8,8), new THREE.MeshPhongMaterial({color:0x222255,emissive:0x111133,shininess:80})));
 }
 
-    // ═════════════════════════════════════
-    // ─── 4D Hypercube (Tesseract)───
-    // ═════════════════════════════════════
+/* ═══════════════════════════════════════════════
+   4D Engine
+═══════════════════════════════════════════════ */
+function getTesseractVertices() {
+  const v = [];
+  for (let i=0;i<16;i++) v.push([(i&1)?1:-1,(i&2)?1:-1,(i&4)?1:-1,(i&8)?1:-1]);
+  return v;
+}
+function getTesseractEdges(verts) {
+  const e = [];
+  for(let i=0;i<16;i++) for(let j=i+1;j<16;j++) {
+    let d=0; for(let k=0;k<4;k++) if(verts[i][k]!==verts[j][k]) d++;
+    if(d===1) e.push([i,j]);
+  }
+  return e;
+}
+function project4DTo3D(v4, f=3.0) {
+  const w = v4[3];
+  const denom = f - w;
+  const s = f / (Math.abs(denom)<0.01?0.01:denom);
+  return [v4[0]*s, v4[1]*s, v4[2]*s];
+}
+function colorFromW(w) {
+  const t = (w+2)/4;
+  const hue = (240+120*t)%360;
+  return new THREE.Color().setHSL(hue/360, 1.0, 0.62);
+}
 
-    // 4D Vertices:16 total (±1, ±1, ±1, ±1)
-    function getTesseractVertices() {
-      const verts = [];
-      for (let i = 0; i < 16; i++) {
-        verts.push([
-          (i & 1) ? 1 : -1,
-          (i & 2) ? 1 : -1,
-          (i & 4) ? 1 : -1,
-          (i & 8) ? 1 : -1,
-        ]);
-      }
-      return verts;
-    }
+let rotAngleXY=0, rotAngleXW=0, rotAngleYZ=0, rotAngleYW=0;
+function rotate4D(v, aXY, aXW, aYZ, aYW) {
+  let [x,y,z,w] = v;
+  const c1=Math.cos(aXY),s1=Math.sin(aXY);
+  let x1=c1*x-s1*y, y1=s1*x+c1*y;
+  const c2=Math.cos(aYZ),s2=Math.sin(aYZ);
+  let z1=c2*z-s2*w, w1=s2*z+c2*w;
+  const c3=Math.cos(aXW),s3=Math.sin(aXW);
+  let x2=c3*x1-s3*w1, w2=s3*x1+c3*w1;
+  const c4=Math.cos(aYW),s4=Math.sin(aYW);
+  let y2=c4*y1-s4*w2, w3=s4*y1+c4*w2;
+  return [x2, y2, z1, w3];
+}
 
-    // 4D 边：两个顶点恰好有 1 total坐标不同时为边
-    function getTesseractEdges(verts) {
-      const edges = [];
-      for (let i = 0; i < 16; i++) {
-        for (let j = i + 1; j < 16; j++) {
-          let diff = 0;
-          for (let k = 0; k < 4; k++) {
-            if (verts[i][k] !== verts[j][k]) diff++;
-          }
-          if (diff === 1) edges.push([i, j]);
-        }
-      }
-      return edges;
-    }
+let tesseractVerts4D = getTesseractVertices();
+let tesseractEdges   = getTesseractEdges(tesseractVerts4D);
+let is4DRotating     = true;
 
-    // 4D→3D 透视投影
-    function project4DTo3D(v4, focalLength) {
-      const f = focalLength !== undefined ? focalLength : 3.0;
-      const w = v4[3];
-      const denom = f - w;
-      const scale = f / (Math.abs(denom) < 0.01 ? 0.01 : denom);
-      return [v4[0] * scale, v4[1] * scale, v4[2] * scale];
-    }
+/* ─── Slice Mode ─── */
+let sliceMode    = false;
+let sliceW       = 0.0;     // current W clip plane
+const SLICE_EPS  = 0.35;    // thickness of slice
 
-    // 根据 w 坐标生成颜色（蓝→红渐变）
-    // w 颜色映射：蓝(Blue) -> 紫(Purple) -> 红(Red)
-    // 色相 240->360->0，完全绕过黄/绿，在浅色背景上极醒目
-    function colorFromW(w) {
-      const t = (w + 2) / 4;  // t in [0,1]
-      const hue = (240 + 120 * t) % 360;  // 240(蓝) -> 300(紫) -> 0(红)
-      return new THREE.Color().setHSL(hue / 360, 1.0, 0.62);
-    }
+let sliceGroup = new THREE.Group();
+g4d.add(sliceGroup);
 
-    // 4D 旋转：在 XY、XW、YZ、YW 平面上旋转
-    let rotAngleXY = 0, rotAngleXW = 0, rotAngleYZ = 0, rotAngleYW = 0;
-    function rotate4D(v, aXY, aXW, aYZ, aYW) {
-      let [x,y,z,w] = v;
-      const c1=Math.cos(aXY), s1=Math.sin(aXY);
-      let x1=c1*x-s1*y, y1=s1*x+c1*y;
-      const c2=Math.cos(aYZ), s2=Math.sin(aYZ);
-      let z1=c2*z-s2*w, w1=s2*z+c2*w;
-      const c3=Math.cos(aXW), s3=Math.sin(aXW);
-      let x2=c3*x1-s3*w1, w2=s3*x1+c3*w1;
-      const c4=Math.cos(aYW), s4=Math.sin(aYW);
-      let y2=c4*y1-s4*w2, w3=s4*y1+c4*w2;
-      return [x2, y2, z1, w3];
-    }
+function onSliceChange(val) {
+  sliceW = parseFloat(val) / 100;
+  document.getElementById('slice-info').textContent =
+    'w = ' + sliceW.toFixed(2) + '  |  slice thickness ±' + SLICE_EPS.toFixed(2);
+  rebuild4DGeometry();
+}
 
-    // 构建 4D 场景
-    let tesseractVerts4D = getTesseractVertices();
-    let tesseractEdges = getTesseractEdges(tesseractVerts4D);
-    let is4DRotating = true;
+function toggleSlice() {
+  if (currentDim !== 4) { setDim(4); }
+  sliceMode = !sliceMode;
+  document.getElementById('btn-slice').classList.toggle('active', sliceMode);
+  document.getElementById('slice-panel').classList.toggle('show', sliceMode);
+  rebuild4DGeometry();
+}
 
-    function rebuild4DGeometry() {
-      while (g4d.children.length > 0) {
-        const child = g4d.children[0];
-        if (child.geometry) child.geometry.dispose();
-        if (child.material) child.material.dispose();
-        g4d.remove(child);
-      }
-      const rotated = tesseractVerts4D.map(v => rotate4D(v, rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW));
-      const pts3D = rotated.map(v => project4DTo3D(v, 3.5));
-      const edgeMat = new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:0.9});  // 深灰，浅色背景最醒目
-      for (const [i,j] of tesseractEdges) {
-        const geo = new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(pts3D[i][0], pts3D[i][1], pts3D[i][2]),
-          new THREE.Vector3(pts3D[j][0], pts3D[j][1], pts3D[j][2])
-        ]);
-        const line = new THREE.Line(geo, edgeMat.clone());
-        g4d.add(line);
-      }
-      for (let i = 0; i < rotated.length; i++) {
-        const w = rotated[i][3];
-        const c = colorFromW(w);
+/* ─── Unfold Mode ─── */
+let unfoldMode   = false;
+let unfoldT      = 0;       // 0=folded, 1=unfolded
+let unfoldDir    = 1;       // +1 = unfolding, -1 = folding
+const UNFOLD_SPD = 0.008;
+
+// Tesseract unfolding: 8 cubes in a 3D cross
+// Each cube described by: center offset (folded), target offset (unfolded), orientation
+const CUBE_SIZE = 1.0; // half-size
+const UNFOLD_CELLS = [
+  // [foldedPos, unfoldedPos, rotAxis, rotAngleFolded, rotAngleUnfolded]
+  // Central column (vertical)
+  { fPos: [0,0,0],  uPos: [0,0,0]   },  // center (stays)
+  { fPos: [0,0,0],  uPos: [0,2,0]   },  // top
+  { fPos: [0,0,0],  uPos: [0,4,0]   },  // top2
+  { fPos: [0,0,0],  uPos: [0,-2,0]  },  // bottom
+  // Arms
+  { fPos: [0,0,0],  uPos: [2,2,0]   },  // right-mid
+  { fPos: [0,0,0],  uPos: [-2,2,0]  },  // left-mid
+  { fPos: [0,0,0],  uPos: [4,2,0]   },  // far-right
+  { fPos: [0,0,0],  uPos: [-4,2,0]  },  // far-left
+];
+
+// Prebuilt cube wireframe for each cell
+function buildWireCube(color, opacity=0.85) {
+  const geo = new THREE.BoxGeometry(2,2,2);
+  const mat = new THREE.MeshBasicMaterial({color, wireframe:true, transparent:true, opacity});
+  return new THREE.Mesh(geo, mat);
+}
+
+// Cell objects for unfolding animation
+const unfoldCells = [];
+const unfoldGroup = new THREE.Group();
+g4d.add(unfoldGroup);
+
+const cellColors = [0xff4455, 0xff8800, 0xffcc00, 0x44cc44, 0x22aaff, 0x8844ff, 0xff44aa, 0x44ccff];
+for (let i=0;i<8;i++) {
+  const mesh = buildWireCube(cellColors[i], 0.75);
+  unfoldGroup.add(mesh);
+  unfoldCells.push(mesh);
+}
+
+function updateUnfoldAnimation(t) {
+  // t: 0=folded (tesseract), 1=unfolded (cross)
+  const ease = t < 0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; // ease in-out quad
+  for (let i=0; i<8; i++) {
+    const cell = unfoldCells[i];
+    const target = UNFOLD_CELLS[i].uPos;
+    // Interpolate from origin (0,0,0) = tesseract center, toward unfolded positions
+    const x = target[0] * ease;
+    const y = target[1] * ease;
+    const z = target[2] * ease;
+    cell.position.set(x, y, z);
+    // Subtle scale — slightly smaller when folded to look "inside" the tesseract
+    const s = 0.88 + 0.12 * ease;
+    cell.scale.setScalar(s);
+  }
+}
+
+function toggleUnfold() {
+  if (currentDim !== 4) { setDim(4); }
+  unfoldMode = !unfoldMode;
+  document.getElementById('btn-unfold').classList.toggle('active', unfoldMode);
+
+  if (!unfoldMode) {
+    // Reset
+    unfoldT = 0;
+    unfoldDir = 1;
+    unfoldGroup.visible = false;
+    document.getElementById('unfold-panel').classList.remove('show');
+  } else {
+    unfoldGroup.visible = true;
+    unfoldDir = 1;
+    document.getElementById('unfold-panel').classList.add('show');
+  }
+}
+
+/* ─── Main 4D geometry rebuild ─── */
+function rebuild4DGeometry() {
+  // Clear only the wireframe part (not unfoldGroup / sliceGroup)
+  const toRemove = [];
+  for (const child of g4d.children) {
+    if (child !== unfoldGroup && child !== sliceGroup) toRemove.push(child);
+  }
+  toRemove.forEach(c => { if(c.geometry) c.geometry.dispose(); if(c.material) c.material.dispose(); g4d.remove(c); });
+
+  if (unfoldMode) {
+    // In unfold mode — just show the cell boxes
+    unfoldGroup.visible = true;
+    return;
+  }
+
+  unfoldGroup.visible = false;
+
+  const rotated = tesseractVerts4D.map(v => rotate4D(v, rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW));
+  const pts3D   = rotated.map(v => project4DTo3D(v, 3.5));
+
+  if (sliceMode) {
+    // ── Slice mode: draw only vertices/edges near sliceW
+    // Draw cutting plane indicator
+    const planeGeo = new THREE.PlaneGeometry(5,5);
+    const planeMat = new THREE.MeshBasicMaterial({color:0x55aaff, side:THREE.DoubleSide, transparent:true, opacity:0.18});
+    const planeMesh= new THREE.Mesh(planeGeo, planeMat);
+    planeMesh.rotation.x = Math.PI/2;
+    planeMesh.position.y = sliceW * 1.5;
+    g4d.add(planeMesh);
+
+    for (const [i,j] of tesseractEdges) {
+      const wi = rotated[i][3];
+      const wj = rotated[j][3];
+      // Check if the edge crosses the slice plane
+      if ((wi - sliceW) * (wj - sliceW) <= 0) {
+        // Interpolate intersection point
+        const alpha = (sliceW - wi) / (wj - wi);
+        const ix = pts3D[i][0] + alpha*(pts3D[j][0]-pts3D[i][0]);
+        const iy = pts3D[i][1] + alpha*(pts3D[j][1]-pts3D[i][1]);
+        const iz = pts3D[i][2] + alpha*(pts3D[j][2]-pts3D[i][2]);
         const dot = new THREE.Mesh(
-          new THREE.SphereGeometry(0.12, 10, 10),
-          new THREE.MeshPhongMaterial({color:c, emissive:c.clone().multiplyScalar(0.3), shininess:80})
+          new THREE.SphereGeometry(0.1,8,8),
+          new THREE.MeshPhongMaterial({color:0x55aaff, emissive:0x1144aa, shininess:90})
         );
-        dot.position.set(pts3D[i][0], pts3D[i][1], pts3D[i][2]);
+        dot.position.set(ix, iy, iz);
         g4d.add(dot);
       }
-      // 4D 基向量箭头
-      const bases = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
-      const bColors = [0xff3333, 0x33cc55, 0x3366ff, 0xddaa00];
-      for (let i = 0; i < 4; i++) {
-        const rot = rotate4D(bases[i], rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW);
-        const p = project4DTo3D(rot, 3.5);
-        const len = Math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]) || 0.01;
-        g4d.add(new THREE.ArrowHelper(
-          new THREE.Vector3(p[0]/len, p[1]/len, p[2]/len),
-          new THREE.Vector3(0,0,0), len*1.5, bColors[i], 0.18, 0.1
-        ));
-      }
-      // S^3 切片（3D 球面）
-      g4d.add(new THREE.Mesh(
-        new THREE.SphereGeometry(1.0, 20, 16),
-        new THREE.MeshBasicMaterial({color:0x8844cc, wireframe:true, transparent:true, opacity:0.12})
+      // Draw edges near the slice in bright highlight
+      const avgW = (wi+wj)/2;
+      const inSlice = Math.abs(avgW - sliceW) < SLICE_EPS;
+      const edgeColor = inSlice ? 0x55ccff : 0x334466;
+      const edgeOpacity = inSlice ? 1.0 : 0.18;
+      const geo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(...pts3D[i]),
+        new THREE.Vector3(...pts3D[j])
+      ]);
+      g4d.add(new THREE.Line(geo, new THREE.LineBasicMaterial({color:edgeColor, transparent:true, opacity:edgeOpacity})));
+    }
+    // Vertices
+    for (let i=0; i<rotated.length; i++) {
+      const w = rotated[i][3];
+      const inSlice = Math.abs(w - sliceW) < SLICE_EPS;
+      const c = inSlice ? new THREE.Color(0x55ddff) : colorFromW(w);
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(inSlice?0.18:0.07, 10, 10),
+        new THREE.MeshPhongMaterial({color:c, emissive:c.clone().multiplyScalar(0.3), shininess:90, transparent:!inSlice, opacity:inSlice?1:0.25})
+      );
+      dot.position.set(...pts3D[i]);
+      g4d.add(dot);
+    }
+  } else {
+    // Normal tesseract rendering
+    const edgeMat = new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:0.9});
+    for (const [i,j] of tesseractEdges) {
+      const geo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(...pts3D[i]),
+        new THREE.Vector3(...pts3D[j])
+      ]);
+      g4d.add(new THREE.Line(geo, edgeMat.clone()));
+    }
+    for (let i=0; i<rotated.length; i++) {
+      const c = colorFromW(rotated[i][3]);
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.12,10,10),
+        new THREE.MeshPhongMaterial({color:c, emissive:c.clone().multiplyScalar(0.3), shininess:80})
+      );
+      dot.position.set(...pts3D[i]);
+      g4d.add(dot);
+    }
+    // Basis arrows
+    const bases   = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+    const bColors = [0xff3333, 0x33cc55, 0x3366ff, 0xddaa00];
+    for (let i=0;i<4;i++) {
+      const rot = rotate4D(bases[i], rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW);
+      const p   = project4DTo3D(rot, 3.5);
+      const len = Math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]) || 0.01;
+      g4d.add(new THREE.ArrowHelper(
+        new THREE.Vector3(p[0]/len,p[1]/len,p[2]/len),
+        new THREE.Vector3(0,0,0), len*1.5, bColors[i], 0.18, 0.1
       ));
     }
+    // S³ hint sphere
+    g4d.add(new THREE.Mesh(
+      new THREE.SphereGeometry(1.0,20,16),
+      new THREE.MeshBasicMaterial({color:0x8844cc, wireframe:true, transparent:true, opacity:0.12})
+    ));
+  }
+}
 
-    function build4D() { rebuild4DGeometry(); }
-    g4d.add(new THREE.Group());  // 初始化 g4d
+function build4D() { rebuild4DGeometry(); }
 
 build1D(); build2D(); build3D(); build4D();
 
-// Lighting
-const ambient = new THREE.AmbientLight(0xffffff, 2.0);
-scene.add(ambient);
+/* ─── Lighting ─── */
+scene.add(new THREE.AmbientLight(0xffffff, 2.0));
 const dir = new THREE.DirectionalLight(0xffffff, 2.5);
-dir.position.set(5, 8, 6);
-scene.add(dir);
+dir.position.set(5,8,6); scene.add(dir);
 const dir2 = new THREE.DirectionalLight(0xaabbff, 1.0);
-dir2.position.set(-4,-3,-5);
-scene.add(dir2);
+dir2.position.set(-4,-3,-5); scene.add(dir2);
 
-// ─────────────── Dimension State ───────────────
-let currentDim = 3;
-let demoRunning = false;
-let demoTimer = null;
+/* ═══════════════════════════════════════════════
+   Dimension State
+═══════════════════════════════════════════════ */
+let currentDim   = 3;
+let demoRunning  = false;
 
 function setDim(d, fromDemo=false) {
-  if(!fromDemo && demoRunning) stopDemo();
+  if (!fromDemo && demoRunning) stopDemo();
   currentDim = d;
-  g1d.visible = d === 1;
-  g2d.visible = d === 2;
-  g3d.visible = d === 3;
-  g4d.visible = d === 4;
+  g1d.visible = d===1;
+  g2d.visible = d===2;
+  g3d.visible = d===3;
+  g4d.visible = d===4;
 
-  document.getElementById('dim-badge').textContent = d + 'D';
-
+  document.getElementById('dim-badge').textContent = d+'D';
   document.querySelectorAll('.formula-section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('sec-' + d + 'd').classList.add('active');
-
+  document.getElementById('sec-'+d+'d').classList.add('active');
   ['1','2','3','4'].forEach(n => {
-    document.getElementById('btn-'+n+'d').classList.toggle('active', n == d);
+    document.getElementById('btn-'+n+'d').classList.toggle('active', n==d);
   });
 
-  // Re-render formulas after switching panel
-  if(window.renderMathInElement) {
+  // Show/hide 4D-specific controls
+  const is4 = (d===4);
+  document.getElementById('btn-4d-rotate').style.display = is4 ? '' : 'none';
+  document.getElementById('btn-unfold').style.display    = is4 ? '' : 'none';
+  document.getElementById('btn-slice').style.display     = is4 ? '' : 'none';
+
+  // Re-render formulas
+  if (window.renderMathInElement) {
     setTimeout(()=>renderMathInElement(document.getElementById('formula-panel'), {
       delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
     }), 80);
   }
 }
-
-// init
 setDim(3);
 
-// ─────────────── Auto Demo ───────────────
+/* ─── Demo ─── */
 const demoSteps = [1, 2, 3, 4];
-let demoIdx = 0;
-let demoStart = 0;
-const stepDuration = 3200; // ms per step
+let demoIdx=0, demoStart=0;
+const stepDuration=3200;
 
 function startDemo() {
-  demoRunning = true;
-  demoIdx = 0;
+  demoRunning=true; demoIdx=0;
+  const T=I18N[currentLang];
   document.getElementById('btn-demo').classList.add('active');
-  document.getElementById('btn-demo').textContent = '⏹ 停止演示';
+  document.getElementById('btn-demo').innerHTML='⏹ '+T.stopDemo;
   document.getElementById('demo-hint').classList.add('show');
-  setDim(demoSteps[0], true);
-  demoStart = performance.now();
+  setDim(demoSteps[0],true);
+  demoStart=performance.now();
 }
-
 function stopDemo() {
-  demoRunning = false;
+  demoRunning=false;
   document.getElementById('btn-demo').classList.remove('active');
-  document.getElementById('btn-demo').textContent = '▶ Auto Demo';
+  document.getElementById('btn-demo').innerHTML='▶ <span data-i18n="autoDemo">'+I18N[currentLang].autoDemo+'</span>';
   document.getElementById('demo-hint').classList.remove('show');
-  document.getElementById('progress-bar').style.width = '0%';
+  document.getElementById('progress-bar').style.width='0%';
 }
-
-function toggleDemo() {
-  if(demoRunning) stopDemo();
-  else startDemo();
-}
+function toggleDemo() { demoRunning?stopDemo():startDemo(); }
 
 function toggleAutoRotate() {
-  controls.autoRotate = !controls.autoRotate;
-  document.getElementById('btn-rotate').classList.toggle('active', controls.autoRotate);
+  controls.autoRotate=!controls.autoRotate;
+  document.getElementById('btn-rotate').classList.toggle('active',controls.autoRotate);
 }
-
 function toggle4DRotate() {
-    is4DRotating = !is4DRotating;
-    document.getElementById('btn-4d-rotate').classList.toggle('active', is4DRotating);
-    var hint = document.getElementById('hint-4d');
-    if (is4DRotating && currentDim === 4) {
-      hint.classList.add('show');
-    } else {
-      hint.classList.remove('show');
-    }
-  }
-
+  is4DRotating=!is4DRotating;
+  document.getElementById('btn-4d-rotate').classList.toggle('active',is4DRotating);
+  const hint=document.getElementById('hint-4d');
+  if(is4DRotating&&currentDim===4) hint.classList.add('show');
+  else hint.classList.remove('show');
+}
 function resetCamera() {
-  camera.position.set(5, 4, 6);
-  controls.target.set(0, 0, 0);
+  camera.position.set(5,4,6);
+  controls.target.set(0,0,0);
   controls.update();
 }
 
-// ─────────────── Animate Loop ───────────────
-let t = 0;
+/* ═══════════════════════════════════════════════
+   Animation Loop
+═══════════════════════════════════════════════ */
+let t=0;
 function animate() {
   requestAnimationFrame(animate);
-  t += 0.016;
+  t+=0.016;
 
-  // Animate sample point in 1D
-  if(g1d.userData.point) {
-    g1d.userData.point.position.x = 2.5 * Math.sin(t * 0.7);
-  }
+  // 1D point animation
+  if(g1d.userData.point) g1d.userData.point.position.x = 2.5*Math.sin(t*0.7);
 
-  // Auto demo logic
+  // Demo logic
   if(demoRunning) {
-    const elapsed = performance.now() - demoStart;
-    const totalIdx = Math.floor(elapsed / stepDuration);
-    const stepProg = (elapsed % stepDuration) / stepDuration;
-
-    if(totalIdx >= demoSteps.length) {
-      // Loop
-      demoStart = performance.now();
-      demoIdx = 0;
-      setDim(demoSteps[0], true);
+    const elapsed=performance.now()-demoStart;
+    const totalIdx=Math.floor(elapsed/stepDuration);
+    const stepProg=(elapsed%stepDuration)/stepDuration;
+    if(totalIdx>=demoSteps.length) {
+      demoStart=performance.now(); demoIdx=0; setDim(demoSteps[0],true);
     } else {
-      if(totalIdx !== demoIdx) {
-        demoIdx = totalIdx;
-        setDim(demoSteps[demoIdx], true);
-      }
-      // Progress bar
-      const overall = (totalIdx + stepProg) / demoSteps.length;
-      document.getElementById('progress-bar').style.width = (overall*100).toFixed(1) + '%';
+      if(totalIdx!==demoIdx){ demoIdx=totalIdx; setDim(demoSteps[demoIdx],true); }
+      document.getElementById('progress-bar').style.width=(((totalIdx+stepProg)/demoSteps.length)*100).toFixed(1)+'%';
     }
   }
 
-  // 4D auto-rotation
-  if(is4DRotating && currentDim===4) {
-    rotAngleXY += 0.008;
-    rotAngleXW += 0.005;
-    rotAngleYZ += 0.003;
-    rotAngleYW += 0.007;
+  // 4D auto rotation
+  if(is4DRotating&&currentDim===4&&!unfoldMode) {
+    rotAngleXY+=0.008; rotAngleXW+=0.005; rotAngleYZ+=0.003; rotAngleYW+=0.007;
     rebuild4DGeometry();
+  }
+
+  // Unfold animation
+  if(unfoldMode&&currentDim===4) {
+    unfoldT = Math.min(1, Math.max(0, unfoldT + unfoldDir*UNFOLD_SPD));
+    updateUnfoldAnimation(unfoldT);
+    // Bounce
+    if(unfoldT>=1) unfoldDir=-1;
+    if(unfoldT<=0) unfoldDir=1;
+    // Update panel
+    const pct=Math.round(unfoldT*100);
+    document.getElementById('unfold-bar').style.width=pct+'%';
+    document.getElementById('unfold-pct').textContent=pct+'%';
   }
 
   controls.update();
@@ -785,7 +1186,7 @@ function animate() {
 }
 animate();
 
-// ─────────────── KaTeX initial render ───────────────
+/* ─── KaTeX initial render ─── */
 document.addEventListener('DOMContentLoaded', () => {
   if(window.renderMathInElement) {
     renderMathInElement(document.getElementById('formula-panel'), {
