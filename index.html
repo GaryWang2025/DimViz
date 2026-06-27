@@ -1326,6 +1326,24 @@ function rebuild4DGeometry() {
 
   const pts3D = rotated.map(v => project4DTo3D(v, 3.5));
 
+  // Dimension Collapse visual: merge paired vertices in 3D projection space
+  // Tesseract pairs: (0,8),(1,9),...,(7,15) — these differ only in W coordinate
+  // Interpolating their 3D positions makes the "merge" visually obvious
+  if (collapseMode && collapseAlpha > 0 && current4DObject === 'tesseract') {
+    for (let i = 0; i < 8; i++) {
+      const j = i + 8;
+      const midX = (pts3D[i][0] + pts3D[j][0]) / 2;
+      const midY = (pts3D[i][1] + pts3D[j][1]) / 2;
+      const midZ = (pts3D[i][2] + pts3D[j][2]) / 2;
+      pts3D[i][0] += (midX - pts3D[i][0]) * collapseAlpha;
+      pts3D[i][1] += (midY - pts3D[i][1]) * collapseAlpha;
+      pts3D[i][2] += (midZ - pts3D[i][2]) * collapseAlpha;
+      pts3D[j][0] += (midX - pts3D[j][0]) * collapseAlpha;
+      pts3D[j][1] += (midY - pts3D[j][1]) * collapseAlpha;
+      pts3D[j][2] += (midZ - pts3D[j][2]) * collapseAlpha;
+    }
+  }
+
   if (sliceMode && !collapseMode) {
     // ── True 4D Cross-Section Visualization ──
     // Collect ALL intersection points: W=sliceW hyperplane ∩ tesseract edges
