@@ -1102,6 +1102,37 @@ function rotate4D(v, aXY, aXW, aYZ, aYW) {
 
 let tesseractVerts4D = getTesseractVertices();
 let tesseractEdges   = getTesseractEdges(tesseractVerts4D);
+/* Tesseract 24 square faces (each face = 4 vertex indices)
+   A square face is defined by choosing 2 varying dimensions (6 choices)
+   and fixing the other 2 dimensions to ±1 (4 choices) → 6×4 = 24 faces */
+let tesseractSquares4D = [];
+(function precomputeSquares() {
+  const varyPairs = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]]; // XY,XZ,XW,YZ,YW,ZW
+  for (const [a,b] of varyPairs) {
+    const fixed = [0,1,2,3].filter(d => d!==a && d!==b);
+    for (let fv0 of [-1,1]) {
+      for (let fv1 of [-1,1]) {
+        const face = [];
+        for (let va of [-1,1]) {
+          for (let vb of [-1,1]) {
+            // Build the 4D vertex: set coords[a]=va, coords[b]=vb, coords[fixed[0]]=fv0, coords[fixed[1]]=fv1
+            let coords = [0,0,0,0];
+            coords[a] = va; coords[b] = vb;
+            coords[fixed[0]] = fv0; coords[fixed[1]] = fv1;
+            // Find index in tesseractVerts4D
+            for (let idx=0; idx<16; idx++) {
+              if (tesseractVerts4D[idx][0]===coords[0] && tesseractVerts4D[idx][1]===coords[1] &&
+                  tesseractVerts4D[idx][2]===coords[2] && tesseractVerts4D[idx][3]===coords[3]) {
+                face.push(idx); break;
+              }
+            }
+          }
+        }
+        tesseractSquares4D.push(face);
+      }
+    }
+  }
+})();
 let cell5Verts4D     = getCell5Vertices();
 let cell5Edges       = getCell5Edges(5);
 
@@ -1189,6 +1220,50 @@ function buildWireCube(color, opacity=0.85) {
 const unfoldCells = [];
 const unfoldGroup = new THREE.Group();
 g4d.add(unfoldGroup);
+
+/* ════════════════════════════════════════
+   3D Convex Hull (for 4D slice cross-section)
+   Given intersection points (Vector3), returns
+   { positions: number[], indices: number[] }
+   for a BufferGeometry mesh.
+═══════════════════════════════════════ */
+function convexHull3D(points) {
+  if (!points || points.length < 4) return null;
+  const eps = 1e-9, faces = [];
+
+  for (let i = 0; i < points.length; i++) {
+    for (let j = i+1; j < points.length; j++) {
+      for (let k = j+1; k < points.length; k++) {
+        const a = points[i], b = points[j], c = points[k];
+        const normal = new THREE.Vector3().crossVectors(
+          new THREE.Vector3().subVectors(b, a),
+          new THREE.Vector3().subVectors(c, a)
+        );
+        if (normal.lengthSq() < eps) continue;
+        normal.normalize();
+        const off = normal.dot(a);
+        let hp = false, hn = false;
+        for (let m = 0; m < points.length; m++) {
+          if (m === i || m === j || m === k) continue;
+          const d = normal.dot(points[m]) - off;
+          if (d > eps) hp = true;
+          if (d < -eps) hn = true;
+          if (hp && hn) break;
+        }
+        if (hp && !hn) faces.push({ tri:[i,k,j], n:normal.clone().negate(), o:-off });
+        else if (!hp && hn) faces.push({ tri:[i,j,k], n:normal.clone(), o:off });
+        else if (!hp && !hn) faces.push({ tri:[i,j,k], n:normal.clone(), o:off });
+      }
+    }
+  }
+  if (faces.length === 0) return null;
+  const positions = [];
+  for (const p of points) positions.push(p.x, p.y, p.z);
+  const indices = [];
+  for (const f of faces) indices.push(f.tri[0], f.tri[1], f.tri[2]);
+  return { positions, indices };
+}
+
 const cellColors = [0xff4455,0xff8800,0xffcc00,0x44cc44,0x22aaff,0x8844ff,0xff44aa,0x44ccff];
 for (let i=0;i<8;i++) {
   const mesh = buildWireCube(cellColors[i], 0.75);
@@ -1252,46 +1327,79 @@ function rebuild4DGeometry() {
   const pts3D = rotated.map(v => project4DTo3D(v, 3.5));
 
   if (sliceMode && !collapseMode) {
-    const planeGeo = new THREE.PlaneGeometry(5,5);
-    const planeMat = new THREE.MeshBasicMaterial({color:0x55aaff,side:THREE.DoubleSide,transparent:true,opacity:0.18});
-    const planeMesh= new THREE.Mesh(planeGeo, planeMat);
-    planeMesh.rotation.x = Math.PI/2;
-    planeMesh.position.y = sliceW * 1.5;
-    g4d.add(planeMesh);
+    // ── True 4D Cross-Section Visualization ──
+    // Collect ALL intersection points: W=sliceW hyperplane ∩ tesseract edges
+    const ipts3 = []; // 3D positions of intersection points
 
-    for (const [i,j] of edges4D) {
-      const wi = rotated[i][3], wj = rotated[j][3];
-      if ((wi - sliceW)*(wj - sliceW) <= 0) {
-        const alpha = (sliceW - wi) / (wj - wi);
-        const ix = pts3D[i][0] + alpha*(pts3D[j][0]-pts3D[i][0]);
-        const iy = pts3D[i][1] + alpha*(pts3D[j][1]-pts3D[i][1]);
-        const iz = pts3D[i][2] + alpha*(pts3D[j][2]-pts3D[i][2]);
-        const dot = new THREE.Mesh(
-          new THREE.SphereGeometry(0.1,8,8),
-          new THREE.MeshPhongMaterial({color:0x55aaff,emissive:0x1144aa,shininess:90})
-        );
-        dot.position.set(ix,iy,iz); g4d.add(dot);
-      }
-      const avgW = (wi+wj)/2;
-      const inSlice = Math.abs(avgW - sliceW) < SLICE_EPS;
+    for (const [ei, ej] of edges4D) {
+      const wi = rotated[ei][3], wj = rotated[ej][3];
+      if ((wi - sliceW) * (wj - sliceW) > 0) continue; // doesn't cross
+      if (Math.abs(wi - wj) < 1e-9) continue; // degenerate
+      const alpha = (sliceW - wi) / (wj - wi);
+      const px = pts3D[ei][0] + alpha * (pts3D[ej][0] - pts3D[ei][0]);
+      const py = pts3D[ei][1] + alpha * (pts3D[ej][1] - pts3D[ei][1]);
+      const pz = pts3D[ei][2] + alpha * (pts3D[ej][2] - pts3D[ei][2]);
+      ipts3.push(new THREE.Vector3(px, py, pz));
+    }
+
+    // Build convex hull of intersection points → the true 3D cross-section
+    let hullResult = null;
+    if (ipts3.length >= 4) {
+      hullResult = convexHull3D(ipts3);
+    }
+
+    // Draw the cross-section as a semi-transparent mesh
+    if (hullResult) {
+      const hGeo = new THREE.BufferGeometry();
+      hGeo.setAttribute('position', new THREE.Float32BufferAttribute(hullResult.positions, 3));
+      hGeo.setIndex(hullResult.indices);
+      hGeo.computeVertexNormals();
+      // Front mesh (bright, slightly opaque)
+      const meshMat = new THREE.MeshPhongMaterial({
+        color: 0x44aaff, transparent: true, opacity: 0.22,
+        side: THREE.DoubleSide, emissive: 0x112244, shininess: 60
+      });
+      const mesh = new THREE.Mesh(hGeo, meshMat);
+      mesh.renderOrder = 10;
+      g4d.add(mesh);
+      // Wireframe overlay
+      const wfMat = new THREE.MeshBasicMaterial({ color: 0x55ccff, wireframe: true, transparent: true, opacity: 0.6 });
+      g4d.add(new THREE.Mesh(hGeo, wfMat));
+    }
+
+    // Draw intersection points as prominent spheres
+    for (const pt of ipts3) {
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.13, 14, 14),
+        new THREE.MeshPhongMaterial({ color: 0x55ddff, emissive: 0x1144aa, shininess: 90 })
+      );
+      dot.position.copy(pt);
+      g4d.add(dot);
+    }
+
+    // Draw tesseract edges with W-based opacity for context
+    const edgeMatSlice = new THREE.LineBasicMaterial({ color: 0x888888, transparent: true, opacity: 0.15 });
+    for (const [i, j] of edges4D) {
       const geo = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(...pts3D[i]), new THREE.Vector3(...pts3D[j])
       ]);
-      g4d.add(new THREE.Line(geo, new THREE.LineBasicMaterial({
-        color: inSlice ? 0x55ccff : 0x334466,
-        transparent:true, opacity: inSlice ? 1.0 : 0.18
-      })));
+      g4d.add(new THREE.Line(geo, edgeMatSlice.clone()));
     }
-    for (let i=0; i<rotated.length; i++) {
-      const w = rotated[i][3];
-      const inSlice = Math.abs(w - sliceW) < SLICE_EPS;
-      const c = inSlice ? new THREE.Color(0x55ddff) : colorFromW(w, wMin, wMax);
+    // Draw tesseract vertices (dimmed)
+    for (let i = 0; i < rotated.length; i++) {
+      const c = colorFromW(rotated[i][3], wMin, wMax);
       const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(inSlice?0.18:0.07, 10, 10),
-        new THREE.MeshPhongMaterial({color:c, emissive:c.clone().multiplyScalar(0.3), shininess:90, transparent:!inSlice, opacity:inSlice?1:0.25})
+        new THREE.SphereGeometry(0.06, 8, 8),
+        new THREE.MeshPhongMaterial({ color: c, transparent: true, opacity: 0.2 })
       );
       dot.position.set(...pts3D[i]); g4d.add(dot);
     }
+
+    // Info label
+    const shapeNames = ['point','segment','triangle','tetrahedron'];
+    const shapeName = ipts3.length >= 4 ? '3D cross-section (' + ipts3.length + ' verts)' : (ipts3.length+' pts');
+    document.getElementById('slice-info').textContent =
+      'w=' + sliceW.toFixed(2) + ' | ' + shapeName;
   } else {
     // Normal / Collapse rendering
     const edgeMat = new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:0.9});
