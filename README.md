@@ -1,11 +1,12 @@
-# DimViz 📐 (V002)
+# DimViz 📐 (V004)
 
-> **Dim**ension **Viz**ualizer — 一维到四维数学空间动态可视化（ℝ¹→ℝ²→ℝ³→ℝ⁴）
+> **Dim**ension **Viz**ualizer — 一维到五维数学空间动态可视化（ℝ¹→ℝ²→ℝ³→ℝ⁴→ℝ⁵）
 
-[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-Click%20Me-blue?style=for-the-badge)](https://68b73c2252df4cf786cafccb8f3ba949.app.codebuddy.work/output/dimension-visualizer.html)
-[![GitHub Pages](https://img.shields.io/badge/📄%20GitHub%20Pages-Visit-brightgreen?style=for-the-badge)](https://garywang2025.github.io/DimViz/)
+[![Live Demo](https://img.shields.io/badge/🌐%20GitHub%20Pages-Live%20Demo-blue?style=for-the-badge)](https://garywang2025.github.io/DimViz/)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)]()
 [![GitHub Stars](https://img.shields.io/github/stars/GaryWang2025/DimViz?style=for-the-badge)](https://github.com/GaryWang2025/DimViz)
+[![Three.js](https://img.shields.io/badge/Three.js-r128-green?style=for-the-badge)](https://threejs.org/)
+[![Zero Build](https://img.shields.io/badge/Build-Zero%20Dependencies-orange?style=for-the-badge)]()
 
 [中文](#中文) | [English](#english)
 
@@ -13,20 +14,33 @@
 
 ## English
 
-### ✨ Features (V002 — 4D Added!)
+### ✨ Features
 
-- 🎯 **Interactive 3D/4D Visualization** — Powered by Three.js, drag to rotate, scroll to zoom
-- 🌀 **4D Tesseract (Hypercube)** — Perspective projection ℝ⁴→ℝ³, 4th dimension encoded as color gradient 🔴🔵
-- 🎯 **Interactive 3D Visualization** — Powered by Three.js, drag to rotate, scroll to zoom
-- 📐 **Rigorous Math Definitions** — Basis, norm, linear transformation, cross product, eigenvalues
-- 🎬 **Auto Demo Mode** — Watch dimensions unfold: 1D → 2D → 3D with smooth animations
-- 🔄 **Auto Rotate** — Orbits the scene automatically for better spatial intuition
-- 📝 **KaTeX Formula Panel** — Real-time LaTeX rendering of mathematical definitions
-- ☀️ **Light Theme** — High-contrast colors, easy on the eyes
+#### Core Visualization
+- 🎯 **Interactive 1D→5D** — Drag to rotate, scroll to zoom, auto-rotate
+- 📐 **Rigorous Math** — KaTeX LaTeX formula panel for each dimension (ℝ¹→ℝ⁵)
+- 🎬 **Auto Demo** — Watch dimensions unfold: 1D → 2D → 3D → 4D → 5D
+
+#### 4D Features
+- 🌀 **Tesseract (Hypercube)** — Perspective projection ℝ⁴→ℝ³, W encoded as color gradient
+- 🔺 **5-cell (Pentachoron)** — 4D analog of tetrahedron, switchable in 4D mode
+- 📦 **Unfold Animation** — Tesseract unfolds into Dalí cross (8 cells → 3D cross)
+- 🔪 **4D Slice** — W-axis cross-section showing the true **3D polyhedron** (convex hull)
+- 🔀 **Dimension Collapse** — Watch 4D continuously collapse into 3D (paired vertex interpolation)
+
+#### 5D Features
+- 🌌 **Penteract (5D Hypercube)** — 32 vertices, 80 edges, double perspective projection 5D→4D→3D
+- 🎨 **V-axis Color Gradient** — 5th dimension encoded as color hue
+
+#### UI / UX
+- 🌙 **Dark / Light Mode** — Full CSS variable theming, scene background syncs
+- 🌐 **i18n** — English / 中文 real-time language toggle
+- 📷 **Screenshot Export** — One-click PNG download
+- 📚 **Tutorial Mode** — 4-step guided intro (auto-launches on first visit, reopenable via ❓)
 
 ### 🚀 Live Demo
 
-☛ **[Try DimViz online →](https://68b73c2252df4cf786cafccb8f3ba949.app.codebuddy.work/output/dimension-visualizer.html)**
+☛ **[Try DimViz online →](https://garywang2025.github.io/DimViz/)**
 
 No install, no build — click and explore!
 
@@ -35,23 +49,22 @@ No install, no build — click and explore!
 No build step required — just open in a browser:
 
 ```bash
-# Clone the repo
 git clone https://github.com/GaryWang2025/DimViz.git
-
-# Open directly
 open output/dimension-visualizer.html
 ```
 
-Or simply download `output/dimension-visualizer.html` and double-click it.
+Or download `output/dimension-visualizer.html` and double-click it.
 
 ### 📐 What's Inside
 
-| Dimension | Visual Elements | Math Concepts |
-|-----------|----------------|----------------|
-| **ℝ¹** (1D) | Number line, basis arrow, sliding point | Space definition, basis, norm, linear map |
-| **ℝ²** (2D) | XY grid, basis vectors, sample vector, projection dashes | Standard basis, Euclidean norm, linear transform, rotation matrix |
-| **ℝ³** (3D) | 3-axis, unit sphere (wireframe), cross product plane, sample vector | Dot product, cross product, eigenvalues, unit sphere $S^2$ |
-| **ℝ⁴** (4D) | Tesseract (hypercube) wireframe, w→color gradient, 6-DOF rotation | Perspective projection, 4D rotation matrices, $SO(4)$ group, color-encoded 4th dimension |
+| Dimension | Object | Vertices | Edges | Key Concepts |
+|-----------|--------|----------|-------|-------------|
+| **ℝ¹** | Number line, basis arrow | — | — | Space definition, basis, norm, linear map |
+| **ℝ²** | XY grid, basis vectors | — | — | Standard basis, rotation matrix, linear transform |
+| **ℝ³** | 3-axis, unit sphere, cross product | — | — | Inner product, cross product, eigenvalues, S² |
+| **ℝ⁴** | **Tesseract** (8-cell) | 16 | 32 | Perspective projection, SO(4), 6 rotation planes |
+| **ℝ⁴** | **5-cell** (Pentachoron) | 5 | 10 | 4-simplex, Schläfli {3,3,3} |
+| **ℝ⁵** | **Penteract** | 32 | 80 | Double projection 5D→4D→3D, SO(5), 10 rotation planes |
 
 ### 🛠️ Tech Stack
 
@@ -59,31 +72,12 @@ Or simply download `output/dimension-visualizer.html` and double-click it.
 - [KaTeX](https://katex.org/) — LaTeX formula rendering
 - Pure HTML/CSS/JS — zero dependencies, no build step
 
-### 📸 Screenshots
-
-![DimViz 3D Visualization](output/screenshot.png)
-
-> Open the [Live Demo](https://68b73c2252df4cf786cafccb8f3ba949.app.codebuddy.work/output/dimension-visualizer.html) to interact with it!
-
 ### 🤝 Contributing & Feedback
 
-We'd love to hear from you! Here's how you can help:
-
-- 🐛 **Found a bug?** → [Open an Issue](https://github.com/GaryWang2025/DimViz/issues/new?template=bug_report.md)
-- 💡 **Have an idea?** → [Suggest a feature](https://github.com/GaryWang2025/DimViz/issues/new?template=feature_request.md)
-- 📢 **General feedback?** → [Start a discussion](https://github.com/GaryWang2025/DimViz/issues/new?template=feedback.md)
-- 🔧 **Want to contribute code?** → PRs are very welcome!
-
-#### V003 Planning 🚀
-
-We're actively planning **V003** (next major version). Current ideas include:
-- 5D visualization (if possible!)
-- More math concepts (manifolds, vector fields, surfaces)
-- Export/screenshot functionality
-- Mobile-friendly UI
-- Chinese/English language toggle
-
-**Tell us what YOU want!** → [Vote or suggest on Issue #1](https://github.com/GaryWang2025/DimViz/issues/1)
+- 🐛 **Bug report** → [Open an Issue](https://github.com/GaryWang2025/DimViz/issues/new?template=bug_report.md)
+- 💡 **Feature request** → [Suggest a feature](https://github.com/GaryWang2025/DimViz/issues/new?template=feature_request.md)
+- 📢 **Feedback** → [Start a discussion](https://github.com/GaryWang2025/DimViz/issues/new?template=feedback.md)
+- 🔧 **Code** → PRs welcome!
 
 ### 📄 License
 
@@ -93,38 +87,46 @@ MIT © 2026
 
 ## 中文
 
-### ✨ 功能特性 (V002 — 4D 新增！)
+### ✨ 功能特性
 
-- 🎯 **可交互 3D/4D 可视化** — Three.js 驱动，拖动旋转，滚轮缩放
-- 🌀 **4D 超立方体（Tesseract）** — 透视投影 ℝ⁴→ℝ³，第4维度（w）编码为颜色渐变 🔴🔵
-- 📐 **严格数学定义** — 基底、范数、线性变换、叉积、特征值、4D 旋转
-- 🎬 **自动演示模式** — 观看维度展开：1D → 2D → 3D，丝滑动画过渡
-- 🔄 **自动旋转** — 摄像机自动环绕，建立空间直觉
-- 📝 **KaTeX 公式面板** — 实时 LaTeX 渲染数学定义
-- ☀️ **浅色主题** — 高对比度配色，清晰易读
+#### 核心可视化
+- 🎯 **可交互 1D→5D** — 拖动旋转，滚轮缩放，自动旋转
+- 📐 **严格数学** — KaTeX LaTeX 公式面板，覆盖 ℝ¹→ℝ⁵
+- 🎬 **自动演示** — 观看维度展开：1D → 2D → 3D → 4D → 5D
 
-### 🚀 快速开始
+#### 4D 功能
+- 🌀 **超立方体（Tesseract）** — 透视投影 ℝ⁴→ℝ³，第4维（W）编码为颜色渐变
+- 🔺 **5-胞体（Pentachoron）** — 四维四面体，4D 模式下可切换
+- 📦 **展开动画** — 超立方体展开为达利十字（8个立方体胞→3D十字形）
+- 🔪 **4D 切片** — W轴截面，显示**真正的3D多面体**（凸包算法）
+- 🔀 **维度塌陷** — 亲眼看4D连续塌缩为3D（成对顶点插值）
 
-无需构建，浏览器直接打开：
+#### 5D 功能
+- 🌌 **五维超立方体（Penteract）** — 32顶点80棱，双重透视投影 5D→4D→3D
+- 🎨 **V轴颜色渐变** — 第5维编码为色相
 
-```bash
-# 克隆仓库
-git clone https://github.com/GaryWang2025/DimViz.git
+#### UI / 体验
+- 🌙 **深色/浅色模式** — CSS 变量全套切换，场景背景同步
+- 🌐 **中英文切换** — 实时语言切换
+- 📷 **截图导出** — 一键下载 PNG
+- 📚 **新手教程** — 4步引导（首次加载自动弹出，❓随时重开）
 
-# 直接打开
-open output/dimension-visualizer.html
-```
+### 🚀 在线体验
 
-或下载 `output/dimension-visualizer.html` 双击打开即可。
+☛ **[点击体验 →](https://garywang2025.github.io/DimViz/)**
+
+无需安装，无需构建 — 打开即用！
 
 ### 📐 内容概览
 
-| 维度 | 可视化元素 | 数学概念 |
-|------|-----------|---------|
-| **ℝ¹**（一维）| 数轴、基向量箭头、滑动点 | 空间定义、基底、范数、线性映射 |
-| **ℝ²**（二维）| XY 网格、基向量、样本向量、投影虚线 | 标准正交基、欧氏范数、线性变换、旋转矩阵 |
-| **ℝ³**（三维）| 三轴、单位球（线框）、叉积平面、样本向量 | 内积、叉积、线性变换特征值、单位球面 $S^2$ |
-| **ℝ⁴**（四维）| 超立方体（线框）、w→颜色渐变、6自由度旋转 | 透视投影、4D 旋转矩阵、$SO(4)$ 群、颜色编码第4维度 |
+| 维度 | 对象 | 顶点 | 棱 | 关键概念 |
+|------|------|------|-----|---------|
+| **ℝ¹** | 数轴、基向量 | — | — | 空间定义、基底、范数、线性映射 |
+| **ℝ²** | XY网格、基向量 | — | — | 标准正交基、旋转矩阵、线性变换 |
+| **ℝ³** | 三轴、单位球、叉积 | — | — | 内积、叉积、特征值、单位球面 S² |
+| **ℝ⁴** | **超立方体**（8-cell） | 16 | 32 | 透视投影、SO(4)、6个旋转平面 |
+| **ℝ⁴** | **5-胞体**（Pentachoron） | 5 | 10 | 4-单纯形、Schläfli {3,3,3} |
+| **ℝ⁵** | **五维超立方体** | 32 | 80 | 双重投影 5D→4D→3D、SO(5)、10个旋转平面 |
 
 ### 🛠️ 技术栈
 
