@@ -160,6 +160,28 @@
       user-select: none;
     }
 
+    /* ── Axis Legend (V005.2) ── */
+    #axis-legend {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: var(--hint-bg);
+      border: 1px solid var(--hint-border);
+      border-radius: 10px;
+      padding: 7px 11px;
+      font-size: 0.72rem;
+      color: var(--hint-color);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      backdrop-filter: blur(4px);
+      z-index: 40;
+      pointer-events: none;
+      user-select: none;
+    }
+    .axis-legend-row { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .axis-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 4px currentColor; }
+
     /* ── Formula Panel ── */
     #formula-panel {
       width: 330px;
@@ -539,6 +561,7 @@
   <div id="canvas-wrap">
     <canvas id="c"></canvas>
     <div id="dim-badge">3D</div>
+    <div id="axis-legend"></div>
 
     <div id="progress-wrap"><div id="progress-bar"></div></div>
 
@@ -972,6 +995,8 @@ function applyLang(lang) {
   if (tutOverlay && !tutOverlay.classList.contains('hidden')) {
     updateTutorialText(tutStep);
   }
+  // Update axis legend labels for new language
+  updateAxisLegend(currentDim);
 }
 function toggleLang() { applyLang(currentLang === 'en' ? 'zh' : 'en'); }
 
@@ -1086,6 +1111,17 @@ const g4d = new THREE.Group();
 const g5d = new THREE.Group();
 scene.add(g1d, g2d, g3d, g4d, g5d);
 
+/* ─── Axis Color Theme (V005.2) ───
+   Each dimension adds one new axis with a fixed color + icon,
+   so users see the dimension "grow" visually. */
+const AXIS_THEME = [
+  { color: 0xff3333, hex: '#ff3333', icon: '❤', en: 'Axis 1',  zh: '第1轴' },
+  { color: 0xffcc00, hex: '#ffcc00', icon: '⭐', en: 'Axis 2',  zh: '第2轴' },
+  { color: 0x33cc55, hex: '#33cc55', icon: '🍀', en: 'Axis 3',  zh: '第3轴' },
+  { color: 0x3366ff, hex: '#3366ff', icon: '❄', en: 'W-axis',  zh: 'W轴' },
+  { color: 0x9933ff, hex: '#9933ff', icon: '🟣', en: 'V-axis',  zh: 'V轴' },
+];
+
 /* ─── Helpers ─── */
 function makeArrow(dir, origin, length, color, headLen=0.18) {
   const d = new THREE.Vector3(...dir).normalize();
@@ -1103,7 +1139,7 @@ function dashedLine(pts, color=0x3a4060) {
 function build1D() {
   const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-4,0,0), new THREE.Vector3(4,0,0)]);
   g1d.add(new THREE.Line(geo, new THREE.LineBasicMaterial({color:0xcc1133, linewidth:3})));
-  g1d.add(makeArrow([1,0,0],[0,0,0],1.6,0xee2244));
+  g1d.add(makeArrow([1,0,0],[0,0,0],1.6,AXIS_THEME[0].color));
   for(let i=-3;i<=3;i++) {
     if(i===0) continue;
     const tg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(i,-0.15,0),new THREE.Vector3(i,0.15,0)]);
@@ -1123,10 +1159,10 @@ function build2D() {
   const gh = new THREE.GridHelper(8,16,0x90a8e8,0xbccaf8);
   gh.rotation.x = Math.PI/2;
   g2d.add(gh);
-  g2d.add(makeArrow([1,0,0],[0,0,0],4.2,0xdd2222,0.22));
-  g2d.add(makeArrow([0,1,0],[0,0,0],4.2,0x118833,0.22));
-  g2d.add(makeArrow([1,0,0],[0,0,0],1.0,0xff6600,0.18));
-  g2d.add(makeArrow([0,1,0],[0,0,0],1.0,0x0088cc,0.18));
+  g2d.add(makeArrow([1,0,0],[0,0,0],4.2,AXIS_THEME[0].color,0.22));
+  g2d.add(makeArrow([0,1,0],[0,0,0],4.2,AXIS_THEME[1].color,0.22));
+  g2d.add(makeArrow([1,0,0],[0,0,0],1.0,AXIS_THEME[0].color,0.18));
+  g2d.add(makeArrow([0,1,0],[0,0,0],1.0,AXIS_THEME[1].color,0.18));
   g2d.add(makeArrow([2,1.5,0],[0,0,0],2.6,0x6633cc,0.2));
   g2d.add(dashedLine([[2,0,0],[2,1.5,0]],0x8866bb));
   g2d.add(dashedLine([[0,1.5,0],[2,1.5,0]],0x8866bb));
@@ -1137,12 +1173,12 @@ function build2D() {
 
 /* ─── 3D ─── */
 function build3D() {
-  g3d.add(makeArrow([1,0,0],[0,0,0],4.5,0xdd2222,0.24));
-  g3d.add(makeArrow([0,1,0],[0,0,0],4.5,0x119933,0.24));
-  g3d.add(makeArrow([0,0,1],[0,0,0],4.5,0x1155ee,0.24));
-  g3d.add(makeArrow([1,0,0],[0,0,0],1.2,0xff5500,0.2));
-  g3d.add(makeArrow([0,1,0],[0,0,0],1.2,0x00bb44,0.2));
-  g3d.add(makeArrow([0,0,1],[0,0,0],1.2,0x0077ff,0.2));
+  g3d.add(makeArrow([1,0,0],[0,0,0],4.5,AXIS_THEME[0].color,0.24));
+  g3d.add(makeArrow([0,1,0],[0,0,0],4.5,AXIS_THEME[1].color,0.24));
+  g3d.add(makeArrow([0,0,1],[0,0,0],4.5,AXIS_THEME[2].color,0.24));
+  g3d.add(makeArrow([1,0,0],[0,0,0],1.2,AXIS_THEME[0].color,0.2));
+  g3d.add(makeArrow([0,1,0],[0,0,0],1.2,AXIS_THEME[1].color,0.2));
+  g3d.add(makeArrow([0,0,1],[0,0,0],1.2,AXIS_THEME[2].color,0.2));
   g3d.add(new THREE.Mesh(new THREE.SphereGeometry(1,32,24), new THREE.MeshBasicMaterial({color:0x4466cc,wireframe:true,transparent:true,opacity:0.3})));
   g3d.add(makeArrow([1,1.2,0.8],[0,0,0],1.88,0x9922dd,0.22));
   const tip = new THREE.Mesh(new THREE.SphereGeometry(0.1,12,12), new THREE.MeshPhongMaterial({color:0x9922dd,emissive:0x660099,shininess:90}));
@@ -1958,7 +1994,7 @@ function rebuild4DGeometry() {
     // Basis arrows (only for tesseract)
     if (current4DObject === 'tesseract') {
       const bases   = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
-      const bColors = [0xff3333,0x33cc55,0x3366ff,0xddaa00];
+      const bColors = [AXIS_THEME[0].color,AXIS_THEME[1].color,AXIS_THEME[2].color,AXIS_THEME[3].color];
       for (let i=0;i<4;i++) {
         const rot = rotate4D(bases[i], rot4Angles);
         if (collapseMode) rot[3] *= (1-collapseAlpha);
@@ -2071,6 +2107,18 @@ function rebuild5DGeometry() {
     g5d.add(dot);
   }
 
+  // Basis arrows (V005.2: 5 axes with theme colors)
+  const bases5 = [[1,0,0,0,0],[0,1,0,0,0],[0,0,1,0,0],[0,0,0,1,0],[0,0,0,0,1]];
+  for (let i=0;i<5;i++) {
+    const rot = rotate5D(bases5[i], rot5Angles);
+    const p = project5DTo3D(rot, 3.5, 3.0);
+    const len = Math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]) || 0.01;
+    g5d.add(new THREE.ArrowHelper(
+      new THREE.Vector3(p[0]/len,p[1]/len,p[2]/len),
+      new THREE.Vector3(0,0,0), len*1.4, AXIS_THEME[i].color, 0.16, 0.09
+    ));
+  }
+
   // Hint sphere
   g5d.add(new THREE.Mesh(
     new THREE.SphereGeometry(1.1,20,16),
@@ -2095,6 +2143,19 @@ dir2.position.set(-4,-3,-5); scene.add(dir2);
 let currentDim  = 3;
 let demoRunning = false;
 
+function updateAxisLegend(d) {
+  const el = document.getElementById('axis-legend');
+  if (!el) return;
+  const zh = (currentLang === 'zh');
+  let html = '';
+  for (let i = 0; i < d; i++) {
+    const a = AXIS_THEME[i];
+    const name = zh ? a.zh : a.en;
+    html += '<div class="axis-legend-row"><span class="axis-legend-dot" style="background:' + a.hex + ';color:' + a.hex + '"></span>' + a.icon + ' ' + name + '</div>';
+  }
+  el.innerHTML = html;
+}
+
 function setDim(d, fromDemo=false) {
   if (!fromDemo && demoRunning) stopDemo();
   currentDim = d;
@@ -2105,6 +2166,7 @@ function setDim(d, fromDemo=false) {
   g5d.visible = d===5;
 
   document.getElementById('dim-badge').textContent = d+'D';
+  updateAxisLegend(d);
   document.querySelectorAll('.formula-section').forEach(s=>s.classList.remove('active'));
   document.getElementById('sec-'+d+'d').classList.add('active');
   ['1','2','3','4','5'].forEach(n => {
