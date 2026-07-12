@@ -789,6 +789,7 @@ const I18N = {
     cellTitle:  'Cell Colors',
     cellAll:    'Show All',
     cellReset:  'Reset',
+    unfoldUnsupported: 'Unfold is not available for 600-cell (600 tetrahedral cells is too complex). Try 8-cell, 5-cell, 16-cell, or 24-cell.',
     resetView:  'Reset View',
     dragHint:   'Drag to rotate · Scroll to zoom',
     stopDemo:   'Stop Demo',
@@ -849,7 +850,7 @@ const I18N = {
     tut_bodies: [
       'A dimension is an independent direction of movement. Move a point → 1D line. Move that line perpendicular → 2D plane. Stack planes → 3D space. Each step adds one new axis.',
       'We live in 3D, so we can\'t "see" 4D directly. Instead, we use perspective projection — the same trick used to draw 3D objects on 2D paper. The 4th axis is called W.',
-      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, unfold it like a 3D cross, or collapse W to watch 4D become 3D.',
+      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, unfold any polytope to see its 3D cells (8 cubes, 5 tetrahedra, 16 tetrahedra, 24 octahedra), or collapse W to watch 4D become 3D.',
       'DimViz V005 adds 5D and more! Explore 5 of the 6 regular 4D polytopes (16-cell, 24-cell, 600-cell with golden ratio), color individual tesseract cells, control all 6 rotation planes independently, and switch to stereographic projection for curved edges.'
     ],
   },
@@ -882,6 +883,7 @@ const I18N = {
     cellTitle:  '胞颜色',
     cellAll:    '显示全部',
     cellReset:  '重置',
+    unfoldUnsupported: '600-cell 的展开不可用（600个四面体胞腔过于复杂）。请选择 8-cell、5-cell、16-cell 或 24-cell。',
     resetView:  '重置视角',
     dragHint:   '拖动旋转 · 滚轮缩放',
     stopDemo:   '停止演示',
@@ -941,7 +943,7 @@ const I18N = {
     tut_bodies: [
       '维度是一个独立的运动方向。移动一个点 → 得到1D线段；让线段垂直移动 → 2D平面；叠加平面 → 3D空间。每一步都增加一个新的坐标轴。',
       '我们生活在3D世界，无法直接"看见"4D。我们用透视投影——就像在2D纸上画3D物体。第4个坐标轴叫做 W 轴。',
-      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割超立方体看截面、像展开纸板一样展开超立方体，或者让W轴塌陷成0，看4D如何变成3D。',
+      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割看截面、展开任意多面体查看其3D胞腔（8个立方体、5个四面体、16个四面体、24个八面体），或者让W轴塌陷成0，看4D如何变成3D。',
       'DimViz V005 新增5D和更多功能！探索6种正则4D多胞体中的5种（16-cell、24-cell、使用黄金比例的600-cell），为超立方体的每个胞体独立着色，独立控制全部6个旋转平面，以及切换立体投影模式查看弯曲棱边。'
     ],
   }
@@ -1517,9 +1519,18 @@ function set4DObject(name) {
     if (btn) btn.classList.toggle('active', name === n);
   });
   // Turn off incompatible modes (direct cleanup, avoid recursion via toggle functions)
+  // Unfold: only available for tesseract, cell5, cell16, cell24 (not cell600)
+  if (unfoldMode && !UNFOLD_DEFS[name]) {
+    unfoldMode=false; document.getElementById('btn-unfold').classList.remove('active');
+    unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show');
+  }
+  // Cell coloring: tesseract only
   if (name !== 'tesseract') {
-    if (unfoldMode) { unfoldMode=false; document.getElementById('btn-unfold').classList.remove('active'); unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show'); }
     if (cellColorMode) { cellColorMode=false; cellIsolated=-1; document.getElementById('btn-cellcolor').classList.remove('active'); document.getElementById('cell-panel').classList.remove('show'); }
+  }
+  // Rebuild unfold cells if unfold is active (switching between supported polytopes)
+  if (unfoldMode && UNFOLD_DEFS[name]) {
+    rebuildUnfoldCells();
   }
   rebuild4DGeometry();
 }
@@ -1577,25 +1588,118 @@ let unfoldMode = false;
 let unfoldT    = 0;
 let unfoldDir  = 1;
 const UNFOLD_SPD = 0.008;
-const CUBE_SIZE  = 1.0;
-const UNFOLD_CELLS = [
-  { fPos: [0,0,0],  uPos: [0,0,0]   },
-  { fPos: [0,0,0],  uPos: [0,2,0]   },
-  { fPos: [0,0,0],  uPos: [0,4,0]   },
-  { fPos: [0,0,0],  uPos: [0,-2,0]  },
-  { fPos: [0,0,0],  uPos: [2,2,0]   },
-  { fPos: [0,0,0],  uPos: [-2,2,0]  },
-  { fPos: [0,0,0],  uPos: [4,2,0]   },
-  { fPos: [0,0,0],  uPos: [-4,2,0]  },
-];
+
+/* ─── Dynamic unfold system (V005.1) ─── */
+const cellColors = [0xff4455,0xff8800,0xffcc00,0x44cc44,0x22aaff,0x8844ff,0xff44aa,0x44ccff,
+                    0xff6644,0x66ff88,0x4488ff,0xff44ff,0x88ff44,0x44ffff,0xff8844,0xaa44ff];
+
 function buildWireCube(color, opacity=0.85) {
   const geo = new THREE.BoxGeometry(2,2,2);
   const mat = new THREE.MeshBasicMaterial({color, wireframe:true, transparent:true, opacity});
   return new THREE.Mesh(geo, mat);
 }
+function buildWireTetrahedron(color, opacity=0.85) {
+  const v = [[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]];
+  const e = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
+  const pos = [];
+  for (const [i,j] of e) pos.push(...v[i], ...v[j]);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  const mat = new THREE.LineBasicMaterial({color, transparent:true, opacity});
+  return new THREE.LineSegments(geo, mat);
+}
+function buildWireOctahedron(color, opacity=0.85) {
+  const v = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  const e = [[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]];
+  const pos = [];
+  for (const [i,j] of e) pos.push(...v[i], ...v[j]);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  const mat = new THREE.LineBasicMaterial({color, transparent:true, opacity});
+  return new THREE.LineSegments(geo, mat);
+}
+
+const UNFOLD_DEFS = {
+  tesseract: {
+    cellCount: 8, cellType: 'cube', cellScale: 1.0,
+    positions: [[0,0,0],[0,2,0],[0,4,0],[0,-2,0],[2,2,0],[-2,2,0],[4,2,0],[-4,2,0]]
+  },
+  cell5: {
+    cellCount: 5, cellType: 'tetra', cellScale: 0.6,
+    positions: (() => {
+      const arr = [];
+      for (let i = 0; i < 5; i++) {
+        const a = i * 2 * Math.PI / 5;
+        arr.push([2.5*Math.cos(a), (i%2===0)?1.2:-1.2, 2.5*Math.sin(a)]);
+      }
+      return arr;
+    })()
+  },
+  cell16: {
+    cellCount: 16, cellType: 'tetra', cellScale: 0.45,
+    positions: (() => {
+      const arr = [];
+      for (let i = 0; i < 16; i++) {
+        const sign = s => s ? 1 : -1;
+        const b0 = (i>>0)&1, b1 = (i>>1)&1, b2 = (i>>2)&1, b3 = (i>>3)&1;
+        arr.push([sign(b0)*2.5, sign(b1)*2.5, sign(b2)*2.5]);
+      }
+      return arr;
+    })()
+  },
+  cell24: {
+    cellCount: 24, cellType: 'octa', cellScale: 0.4,
+    positions: (() => {
+      const arr = [];
+      const base = [];
+      for (const p of [[1,1,0],[1,-1,0],[-1,1,0],[-1,-1,0],[1,0,1],[1,0,-1],[-1,0,1],[-1,0,-1],[0,1,1],[0,1,-1],[0,-1,1],[0,-1,-1]]) {
+        base.push(p);
+      }
+      for (const p of base) {
+        arr.push([p[0]*2.2, p[1]*2.2, p[2]*2.2]);
+      }
+      return arr;
+    })()
+  }
+};
+
 const unfoldCells = [];
 const unfoldGroup = new THREE.Group();
 g4d.add(unfoldGroup);
+
+function rebuildUnfoldCells() {
+  while (unfoldGroup.children.length) {
+    const c = unfoldGroup.children[0];
+    if (c.geometry) c.geometry.dispose();
+    if (c.material) c.material.dispose();
+    unfoldGroup.remove(c);
+  }
+  unfoldCells.length = 0;
+  const def = UNFOLD_DEFS[current4DObject];
+  if (!def) return;
+  for (let i = 0; i < def.cellCount; i++) {
+    const color = cellColors[i % cellColors.length];
+    let mesh;
+    if (def.cellType === 'cube') mesh = buildWireCube(color, 0.75);
+    else if (def.cellType === 'tetra') mesh = buildWireTetrahedron(color, 0.75);
+    else if (def.cellType === 'octa') mesh = buildWireOctahedron(color, 0.75);
+    mesh.scale.setScalar(def.cellScale * 0.88);
+    unfoldGroup.add(mesh);
+    unfoldCells.push(mesh);
+  }
+}
+
+function updateUnfoldAnimation(t) {
+  const ease = t < 0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+  const def = UNFOLD_DEFS[current4DObject];
+  if (!def) return;
+  for (let i = 0; i < unfoldCells.length; i++) {
+    const cell = unfoldCells[i];
+    const target = def.positions[i];
+    cell.position.set(target[0]*ease, target[1]*ease, target[2]*ease);
+    cell.scale.setScalar(def.cellScale * (0.88 + 0.12*ease));
+  }
+}
 
 /* ════════════════════════════════════════
    3D Convex Hull (for 4D slice cross-section)
@@ -1640,23 +1744,15 @@ function convexHull3D(points) {
   return { positions, indices };
 }
 
-const cellColors = [0xff4455,0xff8800,0xffcc00,0x44cc44,0x22aaff,0x8844ff,0xff44aa,0x44ccff];
-for (let i=0;i<8;i++) {
-  const mesh = buildWireCube(cellColors[i], 0.75);
-  unfoldGroup.add(mesh);
-  unfoldCells.push(mesh);
-}
-function updateUnfoldAnimation(t) {
-  const ease = t < 0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
-  for (let i=0; i<8; i++) {
-    const cell = unfoldCells[i];
-    const target = UNFOLD_CELLS[i].uPos;
-    cell.position.set(target[0]*ease, target[1]*ease, target[2]*ease);
-    cell.scale.setScalar(0.88 + 0.12*ease);
-  }
-}
 function toggleUnfold() {
   if (currentDim !== 4) { setDim(4); }
+  if (!UNFOLD_DEFS[current4DObject]) {
+    // 600-cell: too many cells (600 tetrahedra) for unfold
+    const T = I18N[currentLang];
+    alert(T && T.unfoldUnsupported ? T.unfoldUnsupported :
+      'Unfold not available for this polytope (too many cells).');
+    return;
+  }
   unfoldMode = !unfoldMode;
   document.getElementById('btn-unfold').classList.toggle('active', unfoldMode);
   if (!unfoldMode) {
@@ -1664,6 +1760,7 @@ function toggleUnfold() {
     unfoldGroup.visible = false;
     document.getElementById('unfold-panel').classList.remove('show');
   } else {
+    rebuildUnfoldCells();
     unfoldGroup.visible = true; unfoldDir = 1;
     document.getElementById('unfold-panel').classList.add('show');
   }
@@ -1687,7 +1784,7 @@ function rebuild4DGeometry() {
   }
   toRemove.forEach(c => { if(c.geometry) c.geometry.dispose(); if(c.material) c.material.dispose(); g4d.remove(c); });
 
-  if (unfoldMode && current4DObject === 'tesseract') {
+  if (unfoldMode && UNFOLD_DEFS[current4DObject]) {
     unfoldGroup.visible = true;
     return;
   }
@@ -2029,7 +2126,7 @@ function setDim(d, fromDemo=false) {
     // Clean up 4D-specific panels if switching away
     if (sliceMode)    { sliceMode=false;   document.getElementById('slice-panel').classList.remove('show'); }
     if (collapseMode) { collapseMode=false; document.getElementById('collapse-panel').classList.remove('show'); }
-    if (unfoldMode)   { unfoldMode=false;   unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show'); }
+    if (unfoldMode)   { unfoldMode=false;   document.getElementById('btn-unfold').classList.remove('active'); unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show'); }
     if (cellColorMode){ cellColorMode=false;document.getElementById('btn-cellcolor').classList.remove('active'); document.getElementById('cell-panel').classList.remove('show'); }
     if (stereoMode)   { stereoMode=false;  document.getElementById('btn-stereo').classList.remove('active'); }
   }
@@ -2126,7 +2223,7 @@ function animate() {
   }
 
   // Unfold animation
-  if(unfoldMode && currentDim===4) {
+  if(unfoldMode && currentDim===4 && UNFOLD_DEFS[current4DObject]) {
     unfoldT = Math.min(1, Math.max(0, unfoldT + unfoldDir*UNFOLD_SPD));
     updateUnfoldAnimation(unfoldT);
     if(unfoldT>=1) unfoldDir=-1;
