@@ -1640,9 +1640,11 @@ const UNFOLD_DEFS = {
     positions: (() => {
       const arr = [];
       for (let i = 0; i < 16; i++) {
-        const sign = s => s ? 1 : -1;
-        const b0 = (i>>0)&1, b1 = (i>>1)&1, b2 = (i>>2)&1, b3 = (i>>3)&1;
-        arr.push([sign(b0)*2.5, sign(b1)*2.5, sign(b2)*2.5]);
+        arr.push([
+          (i & 1) ? 1.5 : -1.5,
+          (i & 2) ? 1.5 : -1.5,
+          (i >> 2) * 1.5 - 2.25
+        ]);
       }
       return arr;
     })()
@@ -1651,12 +1653,13 @@ const UNFOLD_DEFS = {
     cellCount: 24, cellType: 'octa', cellScale: 0.4,
     positions: (() => {
       const arr = [];
-      const base = [];
-      for (const p of [[1,1,0],[1,-1,0],[-1,1,0],[-1,-1,0],[1,0,1],[1,0,-1],[-1,0,1],[-1,0,-1],[0,1,1],[0,1,-1],[0,-1,1],[0,-1,-1]]) {
-        base.push(p);
-      }
-      for (const p of base) {
-        arr.push([p[0]*2.2, p[1]*2.2, p[2]*2.2]);
+      const spacing = 1.6;
+      for (let i = 0; i < 24; i++) {
+        arr.push([
+          (i % 2) * spacing - spacing / 2,
+          (Math.floor(i / 2) % 3) * spacing - spacing,
+          Math.floor(i / 6) * spacing - 1.5 * spacing
+        ]);
       }
       return arr;
     })()

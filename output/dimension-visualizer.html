@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DimViz V004 | Dimension Visualizer 5D</title>
+  <title>DimViz V005 | Dimension Visualizer 5D</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
@@ -371,6 +371,46 @@
       transition: width 0.1s;
     }
 
+    /* ── Rotation Control Panel (V005) ── */
+    #rot-panel {
+      position: absolute; top: 12px; right: 12px;
+      background: var(--hint-bg); border: 1px solid var(--hint-border);
+      border-radius: 12px; padding: 14px 16px;
+      font-size: 0.76rem; color: var(--hint-color);
+      display: none; flex-direction: column; gap: 6px;
+      min-width: 240px; max-height: 75vh; overflow-y: auto;
+      backdrop-filter: blur(4px); z-index: 50;
+    }
+    #rot-panel.show { display: flex; }
+    #rot-panel .rot-title { font-weight: 700; font-size: 0.82rem; margin-bottom: 4px; }
+    .rot-row { display: flex; align-items: center; gap: 8px; }
+    .rot-row label { width: 40px; font-weight: 600; font-size: 0.74rem; }
+    .rot-row input[type=range] { flex: 1; accent-color: #5080f0; }
+    .rot-row .rot-val { width: 36px; text-align: right; font-size: 0.68rem; opacity: 0.8; }
+    .rot-btns { display: flex; gap: 6px; margin-top: 6px; }
+    .rot-btns button { padding: 3px 10px; font-size: 0.72rem; }
+
+    /* ── Cell Highlight Panel (V005) ── */
+    #cell-panel {
+      position: absolute; top: 12px; left: 12px;
+      background: var(--hint-bg); border: 1px solid var(--hint-border);
+      border-radius: 12px; padding: 12px 14px;
+      font-size: 0.76rem; color: var(--hint-color);
+      display: none; flex-direction: column; gap: 6px;
+      min-width: 180px; backdrop-filter: blur(4px); z-index: 50;
+    }
+    #cell-panel.show { display: flex; }
+    #cell-panel .cell-title { font-weight: 700; font-size: 0.82rem; margin-bottom: 4px; }
+    .cell-grid { display: flex; flex-wrap: wrap; gap: 4px; }
+    .cell-chip {
+      width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+      border: 2px solid transparent; display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700; color: #fff;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .cell-chip:hover { transform: scale(1.15); }
+    .cell-chip.active { border-color: #fff; transform: scale(1.15); }
+
     /* ══════════════════════════════════════════
        Tutorial Overlay
     ══════════════════════════════════════════ */
@@ -463,7 +503,7 @@
 <body>
 
 <!-- ═══════════════ Tutorial Overlay ═══════════════ -->
-<div id="tutorial-overlay">
+<div id="tutorial-overlay" class="hidden">
   <div id="tutorial-card">
     <div id="tutorial-step-label">Step 1 / 4</div>
     <div id="tutorial-title">What is a Dimension?</div>
@@ -484,7 +524,7 @@
 
 <!-- ═══════════════ Header ═══════════════ -->
 <div id="header">
-  <h1>DimViz <span style="font-size:0.68rem;opacity:0.6">V004 &middot; 5D</span></h1>
+  <h1>DimViz <span style="font-size:0.68rem;opacity:0.6">V005 &middot; 5D</span></h1>
   <span class="subtitle">Dimension Visualizer — ℝ¹ → ℝ² → ℝ³ → ℝ⁴ → ℝ⁵</span>
   <div id="header-tools">
     <button class="icon-btn" id="btn-tutorial" onclick="openTutorial()" title="Open tutorial">❓ <span data-i18n="tutorialBtn">Tutorial</span></button>
@@ -525,9 +565,28 @@
       <div id="unfold-progress"><div id="unfold-bar"></div></div>
       <span id="unfold-pct">0%</span>
     </div>
-  </div>
 
-  <!-- ═══════════════ Formula Panel ═══════════════ -->
+    <!-- Rotation Control Panel (V005) -->
+    <div id="rot-panel">
+      <div class="rot-title" data-i18n="rotTitle">Rotation Planes</div>
+      <div id="rot-rows"></div>
+      <div class="rot-btns">
+        <button onclick="rotPauseAll()" data-i18n="rotPauseAll">Pause All</button>
+        <button onclick="rotResumeAll()" data-i18n="rotResumeAll">Resume All</button>
+      </div>
+    </div>
+
+    <!-- Cell Highlight Panel (V005) -->
+    <div id="cell-panel">
+      <div class="cell-title" data-i18n="cellTitle">Cell Colors</div>
+      <div class="cell-grid" id="cell-grid"></div>
+      <div style="display:flex;gap:6px;margin-top:4px">
+        <button onclick="cellShowAll()" style="font-size:0.7rem;padding:3px 8px" data-i18n="cellAll">Show All</button>
+        <button onclick="cellIsolate(-1)" style="font-size:0.7rem;padding:3px 8px" data-i18n="cellReset">Reset</button>
+      </div>
+    </div>
+
+  </div>
   <div id="formula-panel">
 
     <!-- 1D -->
@@ -598,12 +657,23 @@
       <div class="def-title" data-i18n="rot4d">4D Rotation Matrix SO(4)</div>
       <div class="desc" data-i18n="desc_4d_rot">4D rotation occurs in planes (e.g. $xy, xw, yw$). There are 6 independent rotation planes.</div>
       <div class="katex-block">$$R_{xw}(\theta) = \begin{pmatrix}\cos\theta & 0 & 0 & -\sin\theta \\ 0&1&0&0 \\ 0&0&1&0 \\ \sin\theta & 0 & 0 & \cos\theta\end{pmatrix}$$</div>
-      <div class="def-title" data-i18n="tesseract">Hypercube (Tesseract)</div>
+      <div class="def-title" data-i18n="tesseract">Hypercube (Tesseract) — 8-cell</div>
       <div class="desc" data-i18n="desc_tesseract">The 4D analog of a cube: 8 cubic cells, 24 square faces, 32 edges, and 16 vertices.</div>
       <div class="katex-block">$$\text{Vertices: } (\pm 1, \pm 1, \pm 1, \pm 1) \quad (16 \text{ total})$$</div>
-      <div class="def-title" data-i18n="cell5">5-cell (Pentachoron)</div>
+      <div class="def-title" data-i18n="cell5">5-cell (Pentachoron) — {3,3,3}</div>
       <div class="desc" data-i18n="desc_cell5">The 4D analog of a tetrahedron: 5 vertices, 10 edges, 10 triangular faces, 5 tetrahedral cells.</div>
-      <div class="katex-block">$$V_k = \text{Schläfli symbol: } \{3,3,3\}$$</div>
+      <div class="def-title" data-i18n="cell16">16-cell (Hexadecachoron) — {3,3,4}</div>
+      <div class="desc" data-i18n="desc_cell16">The 4D cross-polytope: 8 vertices, 24 edges, 32 triangular faces, 16 tetrahedral cells.</div>
+      <div class="katex-block">$$V = \{(\pm 1, 0, 0, 0) \text{ and permutations}\}$$</div>
+      <div class="def-title" data-i18n="cell24">24-cell (Icositetrachoron) — {3,4,3}</div>
+      <div class="desc" data-i18n="desc_cell24">Unique to 4D — no analog in any other dimension! 24 vertices, 96 edges, 96 triangular faces, 24 octahedral cells.</div>
+      <div class="katex-block">$$V = \{(\pm 1, \pm 1, 0, 0) \text{ and all permutations}\}$$</div>
+      <div class="def-title" data-i18n="cell600">600-cell (Hexacosichoron) — {3,3,5}</div>
+      <div class="desc" data-i18n="desc_cell600">120 vertices, 720 edges, 1200 triangular faces, 600 tetrahedral cells. Uses the golden ratio $\varphi$.</div>
+      <div class="katex-block">$$\varphi = \frac{1+\sqrt{5}}{2}, \quad V_3 = \text{even perms of } \left(\pm\frac{\varphi}{2}, \pm\frac{1}{2}, \pm\frac{1}{2\varphi}, 0\right)$$</div>
+      <div class="def-title" data-i18n="stereoProj">Stereographic Projection</div>
+      <div class="desc" data-i18n="desc_stereoProj">Conformal (angle-preserving) projection from the 3-sphere. Edges appear as arcs, revealing internal structure more clearly than perspective projection.</div>
+      <div class="katex-block">$$\pi_{\text{stereo}}(\mathbf{v}) = \frac{R \cdot \mathbf{v}_{xyz}}{R - v_w}$$</div>
     </div>
 
     <!-- 5D -->
@@ -645,13 +715,17 @@
   <div class="divider"></div>
   <div class="ctrl-group" id="group-4d-obj" style="display:none">
     <span class="ctrl-label" data-i18n="objectLabel">Object:</span>
-    <button id="btn-tesseract" onclick="set4DObject('tesseract')" class="active">Tesseract</button>
+    <button id="btn-tesseract" onclick="set4DObject('tesseract')" class="active">8-cell</button>
     <button id="btn-cell5" onclick="set4DObject('cell5')">5-cell</button>
+    <button id="btn-cell16" onclick="set4DObject('cell16')">16-cell</button>
+    <button id="btn-cell24" onclick="set4DObject('cell24')">24-cell</button>
+    <button id="btn-cell600" onclick="set4DObject('cell600')">600-cell</button>
   </div>
   <div class="divider" id="div-4d-obj" style="display:none"></div>
   <div class="ctrl-group">
-    <button id="btn-4d-rotate" style="display:none" onclick="toggle4DRotate()">⟳ <span data-i18n="rotate4d">4D Rotate</span></button>
-    <button id="btn-5d-rotate" style="display:none" onclick="toggle5DRotate()">⟳ <span data-i18n="rotate5d">5D Rotate</span></button>
+    <button id="btn-4d-rotate" class="active" style="display:none" onclick="toggle4DRotate()">⟳ <span data-i18n="rotate4d">4D Rotate</span></button>
+    <button id="btn-5d-rotate" class="active" style="display:none" onclick="toggle5DRotate()">⟳ <span data-i18n="rotate5d">5D Rotate</span></button>
+    <button id="btn-rot-panel" style="display:none" onclick="toggleRotPanel()">🎛️ <span data-i18n="rotPanelBtn">Planes</span></button>
   </div>
   <div class="divider"></div>
   <div class="ctrl-group">
@@ -662,8 +736,10 @@
     <button id="btn-rotate" class="active" onclick="toggleAutoRotate()">⟳ <span data-i18n="autoRotate">Auto Rotate</span></button>
   </div>
   <div class="divider"></div>
-  <!-- V003 + V004 buttons -->
+  <!-- V003 + V004 + V005 buttons -->
   <div class="ctrl-group">
+    <button id="btn-stereo" style="display:none" onclick="toggleStereo()">🌐 <span data-i18n="stereoBtn">Stereo</span></button>
+    <button id="btn-cellcolor" style="display:none" onclick="toggleCellColor()">🎨 <span data-i18n="cellColorBtn">Cells</span></button>
     <button id="btn-unfold" style="display:none" onclick="toggleUnfold()">📦 <span data-i18n="unfoldBtn">Unfold</span></button>
     <button id="btn-slice" style="display:none" onclick="toggleSlice()">🔪 <span data-i18n="sliceBtn">Slice</span></button>
     <button id="btn-collapse" style="display:none" onclick="toggleCollapse()">🔀 <span data-i18n="collapseBtn">Collapse</span></button>
@@ -704,6 +780,16 @@ const I18N = {
     unfoldBtn:  'Unfold',
     sliceBtn:   'Slice',
     collapseBtn:'Collapse',
+    stereoBtn:  'Stereo',
+    cellColorBtn:'Cells',
+    rotPanelBtn:'Planes',
+    rotTitle:   'Rotation Planes',
+    rotPauseAll:'Pause All',
+    rotResumeAll:'Resume All',
+    cellTitle:  'Cell Colors',
+    cellAll:    'Show All',
+    cellReset:  'Reset',
+    unfoldUnsupported: 'Unfold is not available for 600-cell (600 tetrahedral cells is too complex). Try 8-cell, 5-cell, 16-cell, or 24-cell.',
     resetView:  'Reset View',
     dragHint:   'Drag to rotate · Scroll to zoom',
     stopDemo:   'Stop Demo',
@@ -725,8 +811,12 @@ const I18N = {
     eigenvalue: 'Eigenvalue Equation',
     unitSphere: 'Unit Sphere',
     rot4d:      '4D Rotation Matrix SO(4)',
-    tesseract:  'Hypercube (Tesseract)',
-    cell5:      '5-cell (Pentachoron)',
+    tesseract:  'Hypercube (Tesseract) — 8-cell',
+    cell5:      '5-cell (Pentachoron) — {3,3,3}',
+    cell16:     '16-cell (Hexadecachoron) — {3,3,4}',
+    cell24:     '24-cell (Icositetrachoron) — {3,4,3}',
+    cell600:    '600-cell (Hexacosichoron) — {3,3,5}',
+    stereoProj: 'Stereographic Projection',
     hyperSphere:'Unit Hypersphere S³',
     dim5basis:  'Basis & Dimension',
     rot5d:      '5D Rotation Group SO(5)',
@@ -740,6 +830,10 @@ const I18N = {
     desc_4d_rot:   '4D rotation occurs in planes (e.g. xy, xw, yw). There are 6 independent rotation planes.',
     desc_tesseract:'The 4D analog of a cube: 8 cubic cells, 24 square faces, 32 edges, and 16 vertices.',
     desc_cell5:    'The 4D analog of a tetrahedron: 5 vertices, 10 edges, 10 triangular faces, 5 tetrahedral cells.',
+    desc_cell16:   'The 4D cross-polytope: 8 vertices, 24 edges, 32 triangular faces, 16 tetrahedral cells.',
+    desc_cell24:   'Unique to 4D — no analog in any other dimension! 24 vertices, 96 edges, 96 triangular faces, 24 octahedral cells.',
+    desc_cell600:  '120 vertices, 720 edges, 1200 triangular faces, 600 tetrahedral cells. Uses the golden ratio φ.',
+    desc_stereoProj:'Conformal (angle-preserving) projection from the 3-sphere. Edges appear as arcs, revealing internal structure more clearly than perspective projection.',
     desc_s3:       'The set of points in ℝ⁴ at distance 1 from the origin (a 3-dimensional hypersphere).',
     desc_5d_space: 'Five independent real coordinates. Visualized via double perspective projection: 5D→4D→3D, composing two successive projections.',
     desc_5d_rot:   '5D rotation acts in 10 independent planes: C(5,2)=10. Each plane has a rotation angle. This demo uses 4 simultaneously.',
@@ -756,8 +850,8 @@ const I18N = {
     tut_bodies: [
       'A dimension is an independent direction of movement. Move a point → 1D line. Move that line perpendicular → 2D plane. Stack planes → 3D space. Each step adds one new axis.',
       'We live in 3D, so we can\'t "see" 4D directly. Instead, we use perspective projection — the same trick used to draw 3D objects on 2D paper. The 4th axis is called W.',
-      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, unfold it like a 3D cross, or collapse W to watch 4D become 3D.',
-      'DimViz V004 adds 5D! The penteract has 32 vertices and 80 edges. We apply two projections in sequence: 5D→4D→3D. There are 10 rotation planes in 5D (vs 6 in 4D).'
+      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, unfold any polytope to see its 3D cells (8 cubes, 5 tetrahedra, 16 tetrahedra, 24 octahedra), or collapse W to watch 4D become 3D.',
+      'DimViz V005 adds 5D and more! Explore 5 of the 6 regular 4D polytopes (16-cell, 24-cell, 600-cell with golden ratio), color individual tesseract cells, control all 6 rotation planes independently, and switch to stereographic projection for curved edges.'
     ],
   },
   zh: {
@@ -780,6 +874,16 @@ const I18N = {
     unfoldBtn:  '展开',
     sliceBtn:   '切片',
     collapseBtn:'塌陷',
+    stereoBtn:  '立体投影',
+    cellColorBtn:'胞着色',
+    rotPanelBtn:'旋转面',
+    rotTitle:   '旋转平面',
+    rotPauseAll:'全部暂停',
+    rotResumeAll:'全部恢复',
+    cellTitle:  '胞颜色',
+    cellAll:    '显示全部',
+    cellReset:  '重置',
+    unfoldUnsupported: '600-cell 的展开不可用（600个四面体胞腔过于复杂）。请选择 8-cell、5-cell、16-cell 或 24-cell。',
     resetView:  '重置视角',
     dragHint:   '拖动旋转 · 滚轮缩放',
     stopDemo:   '停止演示',
@@ -801,8 +905,12 @@ const I18N = {
     eigenvalue: '特征值方程',
     unitSphere: '单位球面',
     rot4d:      '4D旋转矩阵 SO(4)',
-    tesseract:  '超立方体（Tesseract）',
-    cell5:      '5-胞体（五维四面体）',
+    tesseract:  '超立方体（Tesseract）— 8-cell',
+    cell5:      '5-胞体（Pentachoron）— {3,3,3}',
+    cell16:     '16-胞体（Hexadecachoron）— {3,3,4}',
+    cell24:     '24-胞体（Icositetrachoron）— {3,4,3}',
+    cell600:    '600-胞体（Hexacosichoron）— {3,3,5}',
+    stereoProj: '立体投影',
     hyperSphere:'单位超球面 S³',
     dim5basis:  '基底与维数',
     rot5d:      '5D旋转群 SO(5)',
@@ -816,6 +924,10 @@ const I18N = {
     desc_4d_rot:   '4D空间中的旋转发生在坐标平面内（如 xy, xw, yw），共6个独立旋转平面。',
     desc_tesseract:'立方体的4D类比：8个正方体胞腔，24个正方形面，32条棱，16个顶点。',
     desc_cell5:    '四面体的4D类比：5个顶点，10条棱，10个三角形面，5个四面体胞腔。',
+    desc_cell16:   '4D交叉多面体：8个顶点，24条棱，32个三角形面，16个四面体胞腔。',
+    desc_cell24:   '四维独有——其他维度没有类比！24个顶点，96条棱，96个三角形面，24个八面体胞腔。',
+    desc_cell600:  '120个顶点，720条棱，1200个三角形面，600个四面体胞腔。使用黄金比例 φ。',
+    desc_stereoProj:'保角映射（保持角度不变），从三维球面投影。边缘显示为弧线，比透视投影更清晰地展示内部结构。',
     desc_s3:       'ℝ⁴中到原点距离为1的点的集合（一个3维超球面）。',
     desc_5d_space: '五个独立实坐标。通过双重透视投影可视化：5D→4D→3D，连续应用两次透视变换。',
     desc_5d_rot:   '5D空间中的旋转有 C(5,2)=10 个独立旋转平面。本演示同时驱动其中4个。',
@@ -831,8 +943,8 @@ const I18N = {
     tut_bodies: [
       '维度是一个独立的运动方向。移动一个点 → 得到1D线段；让线段垂直移动 → 2D平面；叠加平面 → 3D空间。每一步都增加一个新的坐标轴。',
       '我们生活在3D世界，无法直接"看见"4D。我们用透视投影——就像在2D纸上画3D物体。第4个坐标轴叫做 W 轴。',
-      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割超立方体看截面、像展开纸板一样展开超立方体，或者让W轴塌陷成0，看4D如何变成3D。',
-      'DimViz V004 新增5D！五维超立方体（Penteract）有32个顶点和80条棱。我们连续应用两次投影：5D→4D→3D。5D共有10个旋转平面（4D只有6个）。'
+      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割看截面、展开任意多面体查看其3D胞腔（8个立方体、5个四面体、16个四面体、24个八面体），或者让W轴塌陷成0，看4D如何变成3D。',
+      'DimViz V005 新增5D和更多功能！探索6种正则4D多胞体中的5种（16-cell、24-cell、使用黄金比例的600-cell），为超立方体的每个胞体独立着色，独立控制全部6个旋转平面，以及切换立体投影模式查看弯曲棱边。'
     ],
   }
 };
@@ -855,8 +967,11 @@ function applyLang(lang) {
   if (demoRunning) {
     document.getElementById('btn-demo').innerHTML = '⏹ ' + T.stopDemo;
   }
-  // Update tutorial if open
-  applyTutorialStep(tutStep);
+  // Update tutorial text if open (does NOT change dimension)
+  const tutOverlay = document.getElementById('tutorial-overlay');
+  if (tutOverlay && !tutOverlay.classList.contains('hidden')) {
+    updateTutorialText(tutStep);
+  }
 }
 function toggleLang() { applyLang(currentLang === 'en' ? 'zh' : 'en'); }
 
@@ -883,6 +998,12 @@ function tutNext() {
   }
 }
 function applyTutorialStep(step) {
+  updateTutorialText(step);
+  // Auto navigate to suggested dim
+  const suggestDims = [1, 3, 4, 5];
+  setDim(suggestDims[step], true);
+}
+function updateTutorialText(step) {
   const T = I18N[currentLang];
   const isLast = step === TUT_TOTAL - 1;
   document.getElementById('tutorial-step-label').textContent =
@@ -898,9 +1019,6 @@ function applyTutorialStep(step) {
   document.querySelectorAll('.tdot').forEach((d, i) => {
     d.classList.toggle('active', i === step);
   });
-  // Auto navigate to suggested dim
-  const suggestDims = [1, 3, 4, 5];
-  setDim(suggestDims[step], true);
 }
 
 /* ═══════════════════════════════════════════════
@@ -925,7 +1043,7 @@ function takeScreenshot() {
   const url = renderer.domElement.toDataURL('image/png');
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'dimviz-v004-' + Date.now() + '.png';
+  a.download = 'dimviz-v005-' + Date.now() + '.png';
   a.click();
 }
 
@@ -1075,6 +1193,17 @@ function getCell5Edges(n) {
 }
 
 function project4DTo3D(v4, f=3.0) {
+  if (stereoMode) {
+    // Stereographic projection from S³ (unit 4-sphere) north pole
+    // Normalize to unit 4-sphere first
+    let r = Math.sqrt(v4[0]*v4[0]+v4[1]*v4[1]+v4[2]*v4[2]+v4[3]*v4[3]);
+    if (r < 1e-9) r = 1e-9;
+    const x=v4[0]/r, y=v4[1]/r, z=v4[2]/r, w=v4[3]/r;
+    const denom = 1 - w;
+    if (Math.abs(denom) < 0.01) return [0,0,0];
+    const s = 2.0 / denom;
+    return [x*s*1.5, y*s*1.5, z*s*1.5];
+  }
   const w = v4[3];
   const denom = f - w;
   const s = f / (Math.abs(denom)<0.01 ? 0.01 : denom);
@@ -1086,19 +1215,7 @@ function colorFromW(w, mn=-2, mx=2) {
   return new THREE.Color().setHSL(hue/360, 1.0, 0.62);
 }
 
-let rotAngleXY=0, rotAngleXW=0, rotAngleYZ=0, rotAngleYW=0;
-function rotate4D(v, aXY, aXW, aYZ, aYW) {
-  let [x,y,z,w] = v;
-  const c1=Math.cos(aXY),s1=Math.sin(aXY);
-  let x1=c1*x-s1*y, y1=s1*x+c1*y;
-  const c2=Math.cos(aYZ),s2=Math.sin(aYZ);
-  let z1=c2*z-s2*w, w1=s2*z+c2*w;
-  const c3=Math.cos(aXW),s3=Math.sin(aXW);
-  let x2=c3*x1-s3*w1, w2=s3*x1+c3*w1;
-  const c4=Math.cos(aYW),s4=Math.sin(aYW);
-  let y2=c4*y1-s4*w2, w3=s4*y1+c4*w2;
-  return [x2, y2, z1, w3];
-}
+/* (old rotate4D + rotAngleXY etc. removed — V005 uses rot4Angles object, see below) */
 
 let tesseractVerts4D = getTesseractVertices();
 let tesseractEdges   = getTesseractEdges(tesseractVerts4D);
@@ -1136,15 +1253,285 @@ let tesseractSquares4D = [];
 let cell5Verts4D     = getCell5Vertices();
 let cell5Edges       = getCell5Edges(5);
 
+/* ═══════════════════════════════════════════════
+   V005: New 4D polytopes — 16-cell, 24-cell, 600-cell
+═══════════════════════════════════════════════ */
+const PHI_GOLD = (1 + Math.sqrt(5)) / 2;
+
+/* ── 16-cell (Hexadecachoron): 8 vertices, 24 edges ── */
+function get16CellVertices() {
+  const v = [];
+  for (let i = 0; i < 4; i++) for (let s of [-1, 1]) { const p = [0,0,0,0]; p[i] = s * 1.5; v.push(p); }
+  return v;
+}
+function get16CellEdges(verts) {
+  // Every pair of non-opposite vertices is connected
+  const e = [];
+  for (let i = 0; i < verts.length; i++) for (let j = i+1; j < verts.length; j++) {
+    let d2 = 0; for (let k = 0; k < 4; k++) { const diff = verts[i][k] - verts[j][k]; d2 += diff*diff; }
+    if (Math.sqrt(d2) > 0.1) e.push([i, j]); // not the same point (excludes opposites which are at distance 3.0)
+    // Actually: opposites are at distance 3.0, neighbors at distance √(1.5²+1.5²)=~2.12
+    // So exclude distance ≈ 3.0
+  }
+  // Filter: only keep edges with distance < 2.5 (exclude opposites at 3.0)
+  return e.filter(([i,j]) => {
+    let d2 = 0; for (let k = 0; k < 4; k++) { const diff = verts[i][k] - verts[j][k]; d2 += diff*diff; }
+    return Math.sqrt(d2) < 2.5;
+  });
+}
+
+/* ── 24-cell (Icositetrachoron): 24 vertices, 96 edges ── */
+function get24CellVertices() {
+  const v = [];
+  const pairs = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
+  for (const [a,b] of pairs) {
+    for (let sa of [-1,1]) for (let sb of [-1,1]) {
+      const p = [0,0,0,0]; p[a] = sa; p[b] = sb; v.push(p);
+    }
+  }
+  return v;
+}
+function get24CellEdges(verts) {
+  // Edge length = √2 (vertices differing in exactly 2 coordinates, each by ±1... wait)
+  // Actually for 24-cell, two vertices are adjacent if their distance is √2
+  // Vertices are at (±1,±1,0,0) permutations
+  // Two vertices share an edge if distance = √2
+  const e = [];
+  for (let i = 0; i < verts.length; i++) for (let j = i+1; j < verts.length; j++) {
+    let d2 = 0; for (let k = 0; k < 4; k++) { const diff = verts[i][k] - verts[j][k]; d2 += diff*diff; }
+    if (Math.abs(Math.sqrt(d2) - Math.sqrt(2)) < 0.05) e.push([i,j]);
+  }
+  return e;
+}
+
+/* ── 600-cell (Hexacosichoron): 120 vertices, 720 edges ── */
+function get600CellVertices() {
+  const verts = [];
+  // Group 1: (±1,0,0,0) and all permutations → 8
+  for (let i = 0; i < 4; i++) for (let s of [-1,1]) { const v = [0,0,0,0]; v[i] = s; verts.push(v); }
+  // Group 2: (±½,±½,±½,±½) → 16
+  for (let i = 0; i < 16; i++) verts.push([(i&1)?0.5:-0.5,(i&2)?0.5:-0.5,(i&4)?0.5:-0.5,(i&8)?0.5:-0.5]);
+  // Group 3: even permutations of (±φ/2, ±½, ±1/(2φ), 0) → 96
+  const evenPerms = [[0,1,2,3],[0,2,3,1],[0,3,1,2],[1,0,3,2],[1,2,0,3],[1,3,2,0],[2,0,1,3],[2,1,3,0],[2,3,0,1],[3,0,2,1],[3,1,0,2],[3,2,1,0]];
+  const base = [PHI_GOLD/2, 0.5, 1/(2*PHI_GOLD), 0];
+  for (const perm of evenPerms) {
+    for (let s0 = -1; s0 <= 1; s0 += 2) for (let s1 = -1; s1 <= 1; s1 += 2) for (let s2 = -1; s2 <= 1; s2 += 2) {
+      verts.push([s0*base[perm[0]], s1*base[perm[1]], s2*base[perm[2]], base[perm[3]]]);
+    }
+  }
+  // Scale up for visibility
+  return verts.map(v => v.map(x => x * 2.0));
+}
+function get600CellEdges(verts) {
+  const edgeLen = 2.0 / PHI_GOLD;
+  const tol = edgeLen * 0.05;
+  const e = [];
+  for (let i = 0; i < verts.length; i++) for (let j = i+1; j < verts.length; j++) {
+    let d2 = 0; for (let k = 0; k < 4; k++) { const diff = verts[i][k] - verts[j][k]; d2 += diff*diff; }
+    if (Math.abs(Math.sqrt(d2) - edgeLen) < tol) e.push([i,j]);
+  }
+  return e;
+}
+
+const cell16Verts4D = get16CellVertices();
+const cell16Edges   = get16CellEdges(cell16Verts4D);
+const cell24Verts4D = get24CellVertices();
+const cell24Edges   = get24CellEdges(cell24Verts4D);
+let cell600Verts4D  = null;
+let cell600Edges    = null;
+try {
+  cell600Verts4D = get600CellVertices();
+  cell600Edges   = get600CellEdges(cell600Verts4D);
+} catch(e) { console.warn('600-cell init failed:', e); }
+
+/* ── Tesseract cells for cell coloring (V005) ── */
+const tesseractCellDefs = [];
+(function initTesseractCells() {
+  const cellColors = [0xff4455,0xff8800,0xffcc00,0x44cc44,0x22aaff,0x8844ff,0xff44aa,0x44ccff];
+  for (let dim = 0; dim < 4; dim++) {
+    for (let val of [-1, 1]) {
+      const cellVerts = tesseractVerts4D.map((v,i) => ({v,i})).filter(x => x.v[dim] === val).map(x => x.i);
+      const cellEdges = [];
+      for (let a = 0; a < cellVerts.length; a++) for (let b = a+1; b < cellVerts.length; b++) {
+        let d = 0; for (let k = 0; k < 4; k++) if (tesseractVerts4D[cellVerts[a]][k] !== tesseractVerts4D[cellVerts[b]][k]) d++;
+        if (d === 1) cellEdges.push([cellVerts[a], cellVerts[b]]);
+      }
+      tesseractCellDefs.push({dim, val, verts: cellVerts, edges: cellEdges, color: cellColors[tesseractCellDefs.length]});
+    }
+  }
+})();
+
+/* ═══════════════════════════════════════════════
+   V005: Stereographic Projection
+═══════════════════════════════════════════════ */
+let stereoMode = false;
+function toggleStereo() {
+  stereoMode = !stereoMode;
+  document.getElementById('btn-stereo').classList.toggle('active', stereoMode);
+  if (currentDim === 4) rebuild4DGeometry();
+}
+
+/* Slerp for curved edges in stereographic mode */
+function slerp4D(a, b, t) {
+  let dot = 0; for (let i = 0; i < 4; i++) dot += a[i]*b[i];
+  const la = Math.sqrt(a.reduce((s,x) => s+x*x, 0));
+  const lb = Math.sqrt(b.reduce((s,x) => s+x*x, 0));
+  if (la < 1e-9 || lb < 1e-9) return a.map((x,i) => x+(b[i]-x)*t);
+  dot = dot / (la * lb);
+  dot = Math.max(-1, Math.min(1, dot));
+  const theta = Math.acos(dot);
+  if (theta < 0.001) return a.map((x,i) => x+(b[i]-x)*t);
+  const s1 = Math.sin((1-t)*theta) / Math.sin(theta);
+  const s2 = Math.sin(t*theta) / Math.sin(theta);
+  return a.map((x,i) => x*s1 + b[i]*s2);
+}
+
+/* ═══════════════════════════════════════════════
+   V005: Rotation Plane Independent Control
+═══════════════════════════════════════════════ */
+const ROT4_PLANES = ['XY','XZ','XW','YZ','YW','ZW'];
+let rot4Angles = {XY:0, XZ:0, XW:0, YZ:0, YW:0, ZW:0};
+let rot4Speeds = {XY:0.008, XZ:0.004, XW:0.005, YZ:0.003, YW:0.007, ZW:0.002};
+let rot4Active = {XY:true, XZ:false, XW:true, YZ:true, YW:true, ZW:false};
+
+const ROT5_PLANES = ['XY','XZ','XW','XV','YZ','YW','YV','ZW','ZV','WV'];
+let rot5Angles = {};
+let rot5Speeds = {};
+let rot5Active = {};
+ROT5_PLANES.forEach((p,i) => {
+  rot5Angles[p] = 0;
+  rot5Speeds[p] = [0.007,0.004,0.005,0.009,0.003,0.006,0.008,0.002,0.005,0.004][i] || 0.004;
+  rot5Active[p] = i < 4; // first 4 active by default
+});
+
+function rotate4D(v, angles) {
+  let [x,y,z,w] = v;
+  if (angles.XY) { const c=Math.cos(angles.XY),s=Math.sin(angles.XY); const x1=c*x-s*y,y1=s*x+c*y; x=x1;y=y1; }
+  if (angles.XZ) { const c=Math.cos(angles.XZ),s=Math.sin(angles.XZ); const x1=c*x-s*z,z1=s*x+c*z; x=x1;z=z1; }
+  if (angles.XW) { const c=Math.cos(angles.XW),s=Math.sin(angles.XW); const x1=c*x-s*w,w1=s*x+c*w; x=x1;w=w1; }
+  if (angles.YZ) { const c=Math.cos(angles.YZ),s=Math.sin(angles.YZ); const y1=c*y-s*z,z1=s*y+c*z; y=y1;z=z1; }
+  if (angles.YW) { const c=Math.cos(angles.YW),s=Math.sin(angles.YW); const y1=c*y-s*w,w1=s*y+c*w; y=y1;w=w1; }
+  if (angles.ZW) { const c=Math.cos(angles.ZW),s=Math.sin(angles.ZW); const z1=c*z-s*w,w1=s*z+c*w; z=z1;w=w1; }
+  return [x,y,z,w];
+}
+
+function rotate5D(v, angles) {
+  let [x,y,z,w,vv] = v;
+  const apply = (a, ia, ib) => { if(!a) return; const c=Math.cos(a),s=Math.sin(a); const tmp=[x,y,z,w,vv]; const ni=tmp[ia], nj=tmp[ib]; tmp[ia]=c*ni-s*nj; tmp[ib]=s*ni+c*nj; x=tmp[0];y=tmp[1];z=tmp[2];w=tmp[3];vv=tmp[4]; };
+  const idx={X:0,Y:1,Z:2,W:3,V:4};
+  ROT5_PLANES.forEach(p => apply(angles[p], idx[p[0]], idx[p[1]]));
+  return [x,y,z,w,vv];
+}
+
+function buildRotPanel() {
+  const container = document.getElementById('rot-rows');
+  const planes = currentDim === 5 ? ROT5_PLANES : ROT4_PLANES;
+  const speeds = currentDim === 5 ? rot5Speeds : rot4Speeds;
+  const active = currentDim === 5 ? rot5Active : rot4Active;
+  container.innerHTML = '';
+  for (const p of planes) {
+    const row = document.createElement('div');
+    row.className = 'rot-row';
+    const spd = (currentDim === 5 ? rot5Speeds : rot4Speeds)[p];
+    const act = (currentDim === 5 ? rot5Active : rot4Active)[p];
+    row.innerHTML = `<label style="opacity:${act?1:0.4}">${p}</label>` +
+      `<input type="range" min="0" max="30" value="${Math.round(spd*1000)}" oninput="onRotSpeed('${p}',this.value)">` +
+      `<span class="rot-val">${act?'ON':'OFF'}</span>` +
+      `<button style="padding:2px 6px;font-size:0.66rem" onclick="toggleRotPlane('${p}')">${act?'⏸':'▶'}</button>`;
+    container.appendChild(row);
+  }
+}
+function onRotSpeed(plane, val) {
+  const spd = parseFloat(val) / 1000;
+  if (currentDim === 5) rot5Speeds[plane] = spd;
+  else rot4Speeds[plane] = spd;
+}
+function toggleRotPlane(plane) {
+  if (currentDim === 5) rot5Active[plane] = !rot5Active[plane];
+  else rot4Active[plane] = !rot4Active[plane];
+  buildRotPanel();
+}
+function toggleRotPanel() {
+  const panel = document.getElementById('rot-panel');
+  const isShow = panel.classList.contains('show');
+  if (!isShow) buildRotPanel();
+  panel.classList.toggle('show', !isShow);
+}
+function rotPauseAll() {
+  if (currentDim === 5) ROT5_PLANES.forEach(p => rot5Active[p] = false);
+  else ROT4_PLANES.forEach(p => rot4Active[p] = false);
+  buildRotPanel();
+}
+function rotResumeAll() {
+  if (currentDim === 5) ROT5_PLANES.forEach(p => rot5Active[p] = true);
+  else ROT4_PLANES.forEach(p => rot4Active[p] = true);
+  buildRotPanel();
+}
+
+/* ═══════════════════════════════════════════════
+   V005: Cell Coloring Mode
+═══════════════════════════════════════════════ */
+let cellColorMode = false;
+let cellIsolated = -1; // -1 = show all, else show only this cell
+
+function toggleCellColor() {
+  if (currentDim !== 4) setDim(4);
+  if (current4DObject !== 'tesseract') set4DObject('tesseract');
+  cellColorMode = !cellColorMode;
+  document.getElementById('btn-cellcolor').classList.toggle('active', cellColorMode);
+  document.getElementById('cell-panel').classList.toggle('show', cellColorMode);
+  if (cellColorMode) buildCellPanel();
+  cellIsolated = -1;
+  rebuild4DGeometry();
+}
+function buildCellPanel() {
+  const grid = document.getElementById('cell-grid');
+  grid.innerHTML = '';
+  const labels = ['W-','W+','Z-','Z+','Y-','Y+','X-','X+'];
+  for (let i = 0; i < tesseractCellDefs.length; i++) {
+    const cell = tesseractCellDefs[i];
+    const chip = document.createElement('div');
+    chip.className = 'cell-chip';
+    chip.style.background = '#' + cell.color.toString(16).padStart(6,'0');
+    chip.textContent = labels[i] || i;
+    chip.onclick = () => cellIsolate(i);
+    grid.appendChild(chip);
+  }
+}
+function cellIsolate(idx) {
+  cellIsolated = idx;
+  document.querySelectorAll('.cell-chip').forEach((c,i) => c.classList.toggle('active', i === idx));
+  rebuild4DGeometry();
+}
+function cellShowAll() {
+  cellIsolated = -1;
+  document.querySelectorAll('.cell-chip').forEach(c => c.classList.remove('active'));
+  rebuild4DGeometry();
+}
+
 let is4DRotating = true;
-let current4DObject = 'tesseract'; // 'tesseract' | 'cell5'
+let current4DObject = 'tesseract';
 
 function set4DObject(name) {
   current4DObject = name;
-  document.getElementById('btn-tesseract').classList.toggle('active', name==='tesseract');
-  document.getElementById('btn-cell5').classList.toggle('active', name==='cell5');
-  // Turn off incompatible modes for cell5
-  if (name==='cell5' && unfoldMode) toggleUnfold();
+  ['tesseract','cell5','cell16','cell24','cell600'].forEach(n => {
+    const btn = document.getElementById('btn-'+n);
+    if (btn) btn.classList.toggle('active', name === n);
+  });
+  // Turn off incompatible modes (direct cleanup, avoid recursion via toggle functions)
+  // Unfold: only available for tesseract, cell5, cell16, cell24 (not cell600)
+  if (unfoldMode && !UNFOLD_DEFS[name]) {
+    unfoldMode=false; document.getElementById('btn-unfold').classList.remove('active');
+    unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show');
+  }
+  // Cell coloring: tesseract only
+  if (name !== 'tesseract') {
+    if (cellColorMode) { cellColorMode=false; cellIsolated=-1; document.getElementById('btn-cellcolor').classList.remove('active'); document.getElementById('cell-panel').classList.remove('show'); }
+  }
+  // Rebuild unfold cells if unfold is active (switching between supported polytopes)
+  if (unfoldMode && UNFOLD_DEFS[name]) {
+    rebuildUnfoldCells();
+  }
   rebuild4DGeometry();
 }
 
@@ -1201,25 +1588,121 @@ let unfoldMode = false;
 let unfoldT    = 0;
 let unfoldDir  = 1;
 const UNFOLD_SPD = 0.008;
-const CUBE_SIZE  = 1.0;
-const UNFOLD_CELLS = [
-  { fPos: [0,0,0],  uPos: [0,0,0]   },
-  { fPos: [0,0,0],  uPos: [0,2,0]   },
-  { fPos: [0,0,0],  uPos: [0,4,0]   },
-  { fPos: [0,0,0],  uPos: [0,-2,0]  },
-  { fPos: [0,0,0],  uPos: [2,2,0]   },
-  { fPos: [0,0,0],  uPos: [-2,2,0]  },
-  { fPos: [0,0,0],  uPos: [4,2,0]   },
-  { fPos: [0,0,0],  uPos: [-4,2,0]  },
-];
+
+/* ─── Dynamic unfold system (V005.1) ─── */
+const cellColors = [0xff4455,0xff8800,0xffcc00,0x44cc44,0x22aaff,0x8844ff,0xff44aa,0x44ccff,
+                    0xff6644,0x66ff88,0x4488ff,0xff44ff,0x88ff44,0x44ffff,0xff8844,0xaa44ff];
+
 function buildWireCube(color, opacity=0.85) {
   const geo = new THREE.BoxGeometry(2,2,2);
   const mat = new THREE.MeshBasicMaterial({color, wireframe:true, transparent:true, opacity});
   return new THREE.Mesh(geo, mat);
 }
+function buildWireTetrahedron(color, opacity=0.85) {
+  const v = [[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]];
+  const e = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
+  const pos = [];
+  for (const [i,j] of e) pos.push(...v[i], ...v[j]);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  const mat = new THREE.LineBasicMaterial({color, transparent:true, opacity});
+  return new THREE.LineSegments(geo, mat);
+}
+function buildWireOctahedron(color, opacity=0.85) {
+  const v = [[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+  const e = [[0,2],[0,3],[0,4],[0,5],[1,2],[1,3],[1,4],[1,5],[2,4],[2,5],[3,4],[3,5]];
+  const pos = [];
+  for (const [i,j] of e) pos.push(...v[i], ...v[j]);
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  const mat = new THREE.LineBasicMaterial({color, transparent:true, opacity});
+  return new THREE.LineSegments(geo, mat);
+}
+
+const UNFOLD_DEFS = {
+  tesseract: {
+    cellCount: 8, cellType: 'cube', cellScale: 1.0,
+    positions: [[0,0,0],[0,2,0],[0,4,0],[0,-2,0],[2,2,0],[-2,2,0],[4,2,0],[-4,2,0]]
+  },
+  cell5: {
+    cellCount: 5, cellType: 'tetra', cellScale: 0.6,
+    positions: (() => {
+      const arr = [];
+      for (let i = 0; i < 5; i++) {
+        const a = i * 2 * Math.PI / 5;
+        arr.push([2.5*Math.cos(a), (i%2===0)?1.2:-1.2, 2.5*Math.sin(a)]);
+      }
+      return arr;
+    })()
+  },
+  cell16: {
+    cellCount: 16, cellType: 'tetra', cellScale: 0.45,
+    positions: (() => {
+      const arr = [];
+      for (let i = 0; i < 16; i++) {
+        arr.push([
+          (i & 1) ? 1.5 : -1.5,
+          (i & 2) ? 1.5 : -1.5,
+          (i >> 2) * 1.5 - 2.25
+        ]);
+      }
+      return arr;
+    })()
+  },
+  cell24: {
+    cellCount: 24, cellType: 'octa', cellScale: 0.4,
+    positions: (() => {
+      const arr = [];
+      const spacing = 1.6;
+      for (let i = 0; i < 24; i++) {
+        arr.push([
+          (i % 2) * spacing - spacing / 2,
+          (Math.floor(i / 2) % 3) * spacing - spacing,
+          Math.floor(i / 6) * spacing - 1.5 * spacing
+        ]);
+      }
+      return arr;
+    })()
+  }
+};
+
 const unfoldCells = [];
 const unfoldGroup = new THREE.Group();
 g4d.add(unfoldGroup);
+
+function rebuildUnfoldCells() {
+  while (unfoldGroup.children.length) {
+    const c = unfoldGroup.children[0];
+    if (c.geometry) c.geometry.dispose();
+    if (c.material) c.material.dispose();
+    unfoldGroup.remove(c);
+  }
+  unfoldCells.length = 0;
+  const def = UNFOLD_DEFS[current4DObject];
+  if (!def) return;
+  for (let i = 0; i < def.cellCount; i++) {
+    const color = cellColors[i % cellColors.length];
+    let mesh;
+    if (def.cellType === 'cube') mesh = buildWireCube(color, 0.75);
+    else if (def.cellType === 'tetra') mesh = buildWireTetrahedron(color, 0.75);
+    else if (def.cellType === 'octa') mesh = buildWireOctahedron(color, 0.75);
+    mesh.scale.setScalar(def.cellScale * 0.88);
+    unfoldGroup.add(mesh);
+    unfoldCells.push(mesh);
+  }
+}
+
+function updateUnfoldAnimation(t) {
+  const ease = t < 0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+  const def = UNFOLD_DEFS[current4DObject];
+  if (!def) return;
+  for (let i = 0; i < unfoldCells.length; i++) {
+    const cell = unfoldCells[i];
+    const target = def.positions[i];
+    cell.position.set(target[0]*ease, target[1]*ease, target[2]*ease);
+    cell.scale.setScalar(def.cellScale * (0.88 + 0.12*ease));
+  }
+}
 
 /* ════════════════════════════════════════
    3D Convex Hull (for 4D slice cross-section)
@@ -1264,23 +1747,15 @@ function convexHull3D(points) {
   return { positions, indices };
 }
 
-const cellColors = [0xff4455,0xff8800,0xffcc00,0x44cc44,0x22aaff,0x8844ff,0xff44aa,0x44ccff];
-for (let i=0;i<8;i++) {
-  const mesh = buildWireCube(cellColors[i], 0.75);
-  unfoldGroup.add(mesh);
-  unfoldCells.push(mesh);
-}
-function updateUnfoldAnimation(t) {
-  const ease = t < 0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
-  for (let i=0; i<8; i++) {
-    const cell = unfoldCells[i];
-    const target = UNFOLD_CELLS[i].uPos;
-    cell.position.set(target[0]*ease, target[1]*ease, target[2]*ease);
-    cell.scale.setScalar(0.88 + 0.12*ease);
-  }
-}
 function toggleUnfold() {
   if (currentDim !== 4) { setDim(4); }
+  if (!UNFOLD_DEFS[current4DObject]) {
+    // 600-cell: too many cells (600 tetrahedra) for unfold
+    const T = I18N[currentLang];
+    alert(T && T.unfoldUnsupported ? T.unfoldUnsupported :
+      'Unfold not available for this polytope (too many cells).');
+    return;
+  }
   unfoldMode = !unfoldMode;
   document.getElementById('btn-unfold').classList.toggle('active', unfoldMode);
   if (!unfoldMode) {
@@ -1288,12 +1763,23 @@ function toggleUnfold() {
     unfoldGroup.visible = false;
     document.getElementById('unfold-panel').classList.remove('show');
   } else {
+    rebuildUnfoldCells();
     unfoldGroup.visible = true; unfoldDir = 1;
     document.getElementById('unfold-panel').classList.add('show');
   }
 }
 
-/* ─── Main 4D geometry rebuild ─── */
+/* ─── Main 4D geometry rebuild (V005) ─── */
+function get4DObjectData() {
+  switch(current4DObject) {
+    case 'cell5':   return { verts: cell5Verts4D,   edges: cell5Edges   };
+    case 'cell16':  return { verts: cell16Verts4D,  edges: cell16Edges  };
+    case 'cell24':  return { verts: cell24Verts4D,  edges: cell24Edges  };
+    case 'cell600': return { verts: cell600Verts4D||[], edges: cell600Edges||[] };
+    default:        return { verts: tesseractVerts4D, edges: tesseractEdges };
+  }
+}
+
 function rebuild4DGeometry() {
   const toRemove = [];
   for (const child of g4d.children) {
@@ -1301,19 +1787,19 @@ function rebuild4DGeometry() {
   }
   toRemove.forEach(c => { if(c.geometry) c.geometry.dispose(); if(c.material) c.material.dispose(); g4d.remove(c); });
 
-  if (unfoldMode && current4DObject === 'tesseract') {
+  if (unfoldMode && UNFOLD_DEFS[current4DObject]) {
     unfoldGroup.visible = true;
     return;
   }
   unfoldGroup.visible = false;
 
-  // Choose vertex/edge set
-  const verts4D = current4DObject === 'cell5' ? cell5Verts4D : tesseractVerts4D;
-  const edges4D = current4DObject === 'cell5' ? cell5Edges   : tesseractEdges;
+  // Choose vertex/edge set based on current 4D object
+  const { verts: verts4D, edges: edges4D } = get4DObjectData();
+  if (!verts4D || verts4D.length === 0) return;
 
-  // Apply collapse: lerp W coordinate toward 0
+  // Apply rotation using V005 angle object system
   const rotated = verts4D.map(v => {
-    const r = rotate4D(v, rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW);
+    const r = rotate4D(v, rot4Angles);
     if (collapseMode && collapseAlpha > 0) {
       r[3] = r[3] * (1 - collapseAlpha); // collapse W
     }
@@ -1327,8 +1813,6 @@ function rebuild4DGeometry() {
   const pts3D = rotated.map(v => project4DTo3D(v, 3.5));
 
   // Dimension Collapse visual: merge paired vertices in 3D projection space
-  // Tesseract pairs: (0,8),(1,9),...,(7,15) — these differ only in W coordinate
-  // Interpolating their 3D positions makes the "merge" visually obvious
   if (collapseMode && collapseAlpha > 0 && current4DObject === 'tesseract') {
     for (let i = 0; i < 8; i++) {
       const j = i + 8;
@@ -1344,66 +1828,67 @@ function rebuild4DGeometry() {
     }
   }
 
+  // ── Helper: build edge geometry (straight or slerp-curved for stereo) ──
+  function buildEdgeGeo(i, j) {
+    if (stereoMode) {
+      // Curved edge via slerp on the 4-sphere
+      const a = rotated[i], b = rotated[j];
+      const steps = 12;
+      const points = [];
+      for (let s = 0; s <= steps; s++) {
+        const t = s / steps;
+        const mid = slerp4D(a, b, t);
+        if (collapseMode && collapseAlpha > 0) mid[3] *= (1 - collapseAlpha);
+        const p = project4DTo3D(mid, 3.5);
+        points.push(new THREE.Vector3(p[0], p[1], p[2]));
+      }
+      return new THREE.BufferGeometry().setFromPoints(points);
+    }
+    return new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(...pts3D[i]), new THREE.Vector3(...pts3D[j])
+    ]);
+  }
+
   if (sliceMode && !collapseMode) {
     // ── True 4D Cross-Section Visualization ──
-    // Collect ALL intersection points: W=sliceW hyperplane ∩ tesseract edges
-    const ipts3 = []; // 3D positions of intersection points
-
+    const ipts3 = [];
     for (const [ei, ej] of edges4D) {
       const wi = rotated[ei][3], wj = rotated[ej][3];
-      if ((wi - sliceW) * (wj - sliceW) > 0) continue; // doesn't cross
-      if (Math.abs(wi - wj) < 1e-9) continue; // degenerate
+      if ((wi - sliceW) * (wj - sliceW) > 0) continue;
+      if (Math.abs(wi - wj) < 1e-9) continue;
       const alpha = (sliceW - wi) / (wj - wi);
       const px = pts3D[ei][0] + alpha * (pts3D[ej][0] - pts3D[ei][0]);
       const py = pts3D[ei][1] + alpha * (pts3D[ej][1] - pts3D[ei][1]);
       const pz = pts3D[ei][2] + alpha * (pts3D[ej][2] - pts3D[ei][2]);
       ipts3.push(new THREE.Vector3(px, py, pz));
     }
-
-    // Build convex hull of intersection points → the true 3D cross-section
     let hullResult = null;
-    if (ipts3.length >= 4) {
-      hullResult = convexHull3D(ipts3);
-    }
-
-    // Draw the cross-section as a semi-transparent mesh
+    if (ipts3.length >= 4) { hullResult = convexHull3D(ipts3); }
     if (hullResult) {
       const hGeo = new THREE.BufferGeometry();
       hGeo.setAttribute('position', new THREE.Float32BufferAttribute(hullResult.positions, 3));
       hGeo.setIndex(hullResult.indices);
       hGeo.computeVertexNormals();
-      // Front mesh (bright, slightly opaque)
       const meshMat = new THREE.MeshPhongMaterial({
         color: 0x44aaff, transparent: true, opacity: 0.22,
         side: THREE.DoubleSide, emissive: 0x112244, shininess: 60
       });
       const mesh = new THREE.Mesh(hGeo, meshMat);
-      mesh.renderOrder = 10;
-      g4d.add(mesh);
-      // Wireframe overlay
+      mesh.renderOrder = 10; g4d.add(mesh);
       const wfMat = new THREE.MeshBasicMaterial({ color: 0x55ccff, wireframe: true, transparent: true, opacity: 0.6 });
       g4d.add(new THREE.Mesh(hGeo, wfMat));
     }
-
-    // Draw intersection points as prominent spheres
     for (const pt of ipts3) {
       const dot = new THREE.Mesh(
         new THREE.SphereGeometry(0.13, 14, 14),
         new THREE.MeshPhongMaterial({ color: 0x55ddff, emissive: 0x1144aa, shininess: 90 })
       );
-      dot.position.copy(pt);
-      g4d.add(dot);
+      dot.position.copy(pt); g4d.add(dot);
     }
-
-    // Draw tesseract edges with W-based opacity for context
     const edgeMatSlice = new THREE.LineBasicMaterial({ color: 0x888888, transparent: true, opacity: 0.15 });
     for (const [i, j] of edges4D) {
-      const geo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(...pts3D[i]), new THREE.Vector3(...pts3D[j])
-      ]);
-      g4d.add(new THREE.Line(geo, edgeMatSlice.clone()));
+      g4d.add(new THREE.Line(buildEdgeGeo(i, j), edgeMatSlice.clone()));
     }
-    // Draw tesseract vertices (dimmed)
     for (let i = 0; i < rotated.length; i++) {
       const c = colorFromW(rotated[i][3], wMin, wMax);
       const dot = new THREE.Mesh(
@@ -1412,35 +1897,70 @@ function rebuild4DGeometry() {
       );
       dot.position.set(...pts3D[i]); g4d.add(dot);
     }
-
-    // Info label
-    const shapeNames = ['point','segment','triangle','tetrahedron'];
     const shapeName = ipts3.length >= 4 ? '3D cross-section (' + ipts3.length + ' verts)' : (ipts3.length+' pts');
     document.getElementById('slice-info').textContent =
       'w=' + sliceW.toFixed(2) + ' | ' + shapeName;
+  } else if (cellColorMode && current4DObject === 'tesseract') {
+    // ── Cell Coloring Mode (V005) ──
+    for (let ci = 0; ci < tesseractCellDefs.length; ci++) {
+      const cell = tesseractCellDefs[ci];
+      const isIsolated = cellIsolated !== -1 && cellIsolated !== ci;
+      const opacity = isIsolated ? 0.06 : 0.85;
+      const cellColor = new THREE.Color(cell.color);
+      // Edges of this cell
+      for (const [i, j] of cell.edges) {
+        const mat = new THREE.LineBasicMaterial({ color: cellColor, transparent: true, opacity });
+        g4d.add(new THREE.Line(buildEdgeGeo(i, j), mat));
+      }
+      // Vertices of this cell
+      if (!isIsolated) {
+        for (const vi of cell.verts) {
+          const dot = new THREE.Mesh(
+            new THREE.SphereGeometry(0.14, 12, 12),
+            new THREE.MeshPhongMaterial({ color: cellColor, emissive: cellColor.clone().multiplyScalar(0.3), shininess: 80 })
+          );
+          dot.position.set(...pts3D[vi]); g4d.add(dot);
+        }
+      }
+    }
+    // S³ hint
+    g4d.add(new THREE.Mesh(
+      new THREE.SphereGeometry(1.0,20,16),
+      new THREE.MeshBasicMaterial({color:0x8844cc,wireframe:true,transparent:true,opacity:0.1})
+    ));
   } else {
-    // Normal / Collapse rendering
-    const edgeMat = new THREE.LineBasicMaterial({color:0x111111, transparent:true, opacity:0.9});
+    // ── Normal / Collapse rendering ──
+    // Edge color: W-based gradient for tesseract/cell5, distinct for larger polytopes
+    const useGradient = (current4DObject === 'tesseract' || current4DObject === 'cell5');
     for (const [i,j] of edges4D) {
-      const geo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(...pts3D[i]), new THREE.Vector3(...pts3D[j])
-      ]);
-      g4d.add(new THREE.Line(geo, edgeMat.clone()));
+      let color;
+      if (useGradient) {
+        const avgW = (rotated[i][3]+rotated[j][3])/2;
+        color = colorFromW(avgW, wMin, wMax);
+      } else {
+        // For 16/24/600-cell, use a consistent cyan-white based on W
+        const avgW = (rotated[i][3]+rotated[j][3])/2;
+        const t = (wMax - wMin) > 0.01 ? (avgW - wMin)/(wMax - wMin) : 0.5;
+        color = new THREE.Color().setHSL((180 + 60*t)/360, 0.8, 0.65);
+      }
+      const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.85 });
+      g4d.add(new THREE.Line(buildEdgeGeo(i, j), mat));
     }
     for (let i=0; i<rotated.length; i++) {
       const c = colorFromW(rotated[i][3], wMin, wMax);
+      const r = current4DObject === 'cell600' ? 0.06 : (current4DObject === 'cell24' ? 0.08 : 0.12);
       const dot = new THREE.Mesh(
-        new THREE.SphereGeometry(0.12,10,10),
+        new THREE.SphereGeometry(r,10,10),
         new THREE.MeshPhongMaterial({color:c, emissive:c.clone().multiplyScalar(0.3), shininess:80})
       );
       dot.position.set(...pts3D[i]); g4d.add(dot);
     }
-    // Basis arrows (only for tesseract, not cell5)
+    // Basis arrows (only for tesseract)
     if (current4DObject === 'tesseract') {
       const bases   = [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
       const bColors = [0xff3333,0x33cc55,0x3366ff,0xddaa00];
       for (let i=0;i<4;i++) {
-        const rot = rotate4D(bases[i], rotAngleXY, rotAngleXW, rotAngleYZ, rotAngleYW);
+        const rot = rotate4D(bases[i], rot4Angles);
         if (collapseMode) rot[3] *= (1-collapseAlpha);
         const p = project4DTo3D(rot, 3.5);
         const len = Math.sqrt(p[0]*p[0]+p[1]*p[1]+p[2]*p[2]) || 0.01;
@@ -1481,26 +2001,8 @@ function getPenteractEdges(verts) {
   return e;
 }
 
-// 5D rotation: 4 planes for visual interest
-let rot5_XY=0, rot5_XW=0, rot5_YV=0, rot5_ZV=0;
+/* (old rotate5D + rot5_XY etc. removed — V005 uses rot5Angles object, see V005 section) */
 let is5DRotating = true;
-
-function rotate5D(v, aXY, aXW, aYV, aZV) {
-  let [x,y,z,w,vv] = v;
-  // XY plane
-  const c1=Math.cos(aXY),s1=Math.sin(aXY);
-  let x1=c1*x-s1*y, y1=s1*x+c1*y;
-  // XW plane
-  const c2=Math.cos(aXW),s2=Math.sin(aXW);
-  let x2=c2*x1-s2*w, w1=s2*x1+c2*w;
-  // YV plane
-  const c3=Math.cos(aYV),s3=Math.sin(aYV);
-  let y2=c3*y1-s3*vv, v1=s3*y1+c3*vv;
-  // ZV plane
-  const c4=Math.cos(aZV),s4=Math.sin(aZV);
-  let z1=c4*z-s4*v1, v2=s4*z+c4*v1;
-  return [x2, y2, z1, w1, v2];
-}
 
 function project5DTo3D(v5, fV=3.5, fW=3.0) {
   // 5D→4D (project out v dimension)
@@ -1534,9 +2036,8 @@ function rebuild5DGeometry() {
     g5d.remove(c);
   }
 
-  const rotated5 = penteractVerts5D.map(v =>
-    rotate5D(v, rot5_XY, rot5_XW, rot5_YV, rot5_ZV)
-  );
+  // V005: use rot5Angles object (all 10 planes)
+  const rotated5 = penteractVerts5D.map(v => rotate5D(v, rot5Angles));
   const projected = rotated5.map(v => project5DTo3D(v, 3.5, 3.0));
   const pts3D = projected.map(p => [p[0], p[1], p[2]]);
 
@@ -1550,7 +2051,6 @@ function rebuild5DGeometry() {
       new THREE.Vector3(...pts3D[i]),
       new THREE.Vector3(...pts3D[j])
     ]);
-    // Color by average V coordinate
     const avgV = (rotated5[i][4]+rotated5[j][4])/2;
     const t = (avgV-vMin)/(vMax-vMin+0.001);
     const hue = (200+160*t)%360;
@@ -1619,6 +2119,9 @@ function setDim(d, fromDemo=false) {
   document.getElementById('btn-unfold').style.display       = is4 ? '' : 'none';
   document.getElementById('btn-slice').style.display        = is4 ? '' : 'none';
   document.getElementById('btn-collapse').style.display     = is4 ? '' : 'none';
+  document.getElementById('btn-stereo').style.display       = is4 ? '' : 'none';
+  document.getElementById('btn-cellcolor').style.display    = is4 ? '' : 'none';
+  document.getElementById('btn-rot-panel').style.display    = (is4||is5) ? '' : 'none';
   document.getElementById('group-4d-obj').style.display     = is4 ? '' : 'none';
   document.getElementById('div-4d-obj').style.display       = is4 ? '' : 'none';
 
@@ -1626,7 +2129,12 @@ function setDim(d, fromDemo=false) {
     // Clean up 4D-specific panels if switching away
     if (sliceMode)    { sliceMode=false;   document.getElementById('slice-panel').classList.remove('show'); }
     if (collapseMode) { collapseMode=false; document.getElementById('collapse-panel').classList.remove('show'); }
-    if (unfoldMode)   { unfoldMode=false;   unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show'); }
+    if (unfoldMode)   { unfoldMode=false;   document.getElementById('btn-unfold').classList.remove('active'); unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show'); }
+    if (cellColorMode){ cellColorMode=false;document.getElementById('btn-cellcolor').classList.remove('active'); document.getElementById('cell-panel').classList.remove('show'); }
+    if (stereoMode)   { stereoMode=false;  document.getElementById('btn-stereo').classList.remove('active'); }
+  }
+  if (!is4 && !is5) {
+    document.getElementById('rot-panel').classList.remove('show');
   }
 
   if (window.renderMathInElement) {
@@ -1705,20 +2213,20 @@ function animate() {
     }
   }
 
-  // 4D auto rotation
+  // 4D auto rotation (V005: uses rot4Angles/rot4Speeds/rot4Active)
   if(is4DRotating && currentDim===4 && !unfoldMode) {
-    rotAngleXY+=0.008; rotAngleXW+=0.005; rotAngleYZ+=0.003; rotAngleYW+=0.007;
+    ROT4_PLANES.forEach(p => { if (rot4Active[p]) rot4Angles[p] += rot4Speeds[p]; });
     rebuild4DGeometry();
   }
 
-  // 5D auto rotation
+  // 5D auto rotation (V005: uses rot5Angles/rot5Speeds/rot5Active)
   if(is5DRotating && currentDim===5) {
-    rot5_XY+=0.007; rot5_XW+=0.005; rot5_YV+=0.009; rot5_ZV+=0.004;
+    ROT5_PLANES.forEach(p => { if (rot5Active[p]) rot5Angles[p] += rot5Speeds[p]; });
     rebuild5DGeometry();
   }
 
   // Unfold animation
-  if(unfoldMode && currentDim===4) {
+  if(unfoldMode && currentDim===4 && UNFOLD_DEFS[current4DObject]) {
     unfoldT = Math.min(1, Math.max(0, unfoldT + unfoldDir*UNFOLD_SPD));
     updateUnfoldAnimation(unfoldT);
     if(unfoldT>=1) unfoldDir=-1;
@@ -1740,8 +2248,11 @@ document.addEventListener('DOMContentLoaded', () => {
       delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
     });
   }
-  // Show tutorial on first load
-  openTutorial();
+  // Show tutorial only on first visit (localStorage)
+  if (!localStorage.getItem('dimviz_tutorial_seen')) {
+    openTutorial();
+    localStorage.setItem('dimviz_tutorial_seen', '1');
+  }
 });
 </script>
 </body>
