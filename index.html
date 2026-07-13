@@ -361,7 +361,7 @@
       line-height: 1.4;
     }
 
-    /* ── Unfold progress panel ── */
+    /* ── Explode progress panel ── */
     #unfold-panel {
       position: absolute;
       top: 12px;
@@ -582,9 +582,9 @@
       <div id="collapse-info" data-i18n="collapseInfo">0% — fully 4D</div>
     </div>
 
-    <!-- Unfold progress -->
+    <!-- Explode progress -->
     <div id="unfold-panel">
-      <span data-i18n="unfoldLabel">Unfolding</span>
+      <span data-i18n="explodeLabel">Exploding</span>
       <div id="unfold-progress"><div id="unfold-bar"></div></div>
       <span id="unfold-pct">0%</span>
     </div>
@@ -763,7 +763,7 @@
   <div class="ctrl-group">
     <button id="btn-stereo" style="display:none" onclick="toggleStereo()">🌐 <span data-i18n="stereoBtn">Stereo</span></button>
     <button id="btn-cellcolor" style="display:none" onclick="toggleCellColor()">🎨 <span data-i18n="cellColorBtn">Cells</span></button>
-    <button id="btn-unfold" style="display:none" onclick="toggleUnfold()">📦 <span data-i18n="unfoldBtn">Unfold</span></button>
+    <button id="btn-unfold" style="display:none" onclick="toggleUnfold()">💥 <span data-i18n="explodeBtn">Explode Cells</span></button>
     <button id="btn-slice" style="display:none" onclick="toggleSlice()">🔪 <span data-i18n="sliceBtn">Slice</span></button>
     <button id="btn-collapse" style="display:none" onclick="toggleCollapse()">🔀 <span data-i18n="collapseBtn">Collapse</span></button>
   </div>
@@ -793,14 +793,14 @@ const I18N = {
     sliceTitle: '4D Slice Mode (W-axis)',
     collapseTitle:'Dimension Collapse (W → 0)',
     collapseInfo:'0% — fully 4D',
-    unfoldLabel:'Unfolding',
+    explodeLabel:'Exploding',
     dimensionLabel:'Dimension:',
     objectLabel: 'Object:',
     rotate4d:   '4D Rotate',
     rotate5d:   '5D Rotate',
     autoDemo:   'Auto Demo',
     autoRotate: 'Auto Rotate',
-    unfoldBtn:  'Unfold',
+    explodeBtn:  'Explode Cells',
     sliceBtn:   'Slice',
     collapseBtn:'Collapse',
     stereoBtn:  'Stereo',
@@ -812,7 +812,7 @@ const I18N = {
     cellTitle:  'Cell Colors',
     cellAll:    'Show All',
     cellReset:  'Reset',
-    unfoldUnsupported: 'Unfold is not available for 600-cell (600 tetrahedral cells is too complex). Try 8-cell, 5-cell, 16-cell, or 24-cell.',
+    explodeUnsupported: 'Exploded view is not available for 600-cell (600 tetrahedral cells is too complex). Try 8-cell, 5-cell, 16-cell, or 24-cell.',
     resetView:  'Reset View',
     dragHint:   'Drag to rotate · Scroll to zoom',
     stopDemo:   'Stop Demo',
@@ -869,11 +869,11 @@ const I18N = {
     tut_next: 'Next →',
     tut_start: 'Start Exploring!',
     tut_titles: ['What is a Dimension?','From 3D to 4D','The 4th Dimension','Welcome to 5D'],
-    tut_visuals: ['· → — → □ → ☐','□ + depth → ☐ + W-axis','Slice · Unfold · Collapse','☐ + V-axis → Penteract ⬡'],
+    tut_visuals: ['· → — → □ → ☐','□ + depth → ☐ + W-axis','Slice · Explode · Collapse','☐ + V-axis → Penteract ⬡'],
     tut_bodies: [
       'A dimension is an independent direction of movement. Move a point → 1D line. Move that line perpendicular → 2D plane. Stack planes → 3D space. Each step adds one new axis.',
       'We live in 3D, so we can\'t "see" 4D directly. Instead, we use perspective projection — the same trick used to draw 3D objects on 2D paper. The 4th axis is called W.',
-      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, unfold any polytope to see its 3D cells (8 cubes, 5 tetrahedra, 16 tetrahedra, 24 octahedra), or collapse W to watch 4D become 3D.',
+      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, explode any polytope to separate its 3D cells (8 cubes, 5 tetrahedra, 16 tetrahedra, 24 octahedra), or collapse W to watch 4D become 3D.',
       'DimViz V005 adds 5D and more! Explore 5 of the 6 regular 4D polytopes (16-cell, 24-cell, 600-cell with golden ratio), color individual tesseract cells, control all 6 rotation planes independently, and switch to stereographic projection for curved edges.'
     ],
   },
@@ -887,14 +887,14 @@ const I18N = {
     sliceTitle: '4D 切片模式（W轴）',
     collapseTitle:'维度塌陷（W → 0）',
     collapseInfo:'0% — 完整4D状态',
-    unfoldLabel:'展开中',
+    explodeLabel:'分离中',
     dimensionLabel:'维度：',
     objectLabel: '对象：',
     rotate4d:   '4D旋转',
     rotate5d:   '5D旋转',
     autoDemo:   '自动演示',
     autoRotate: '自动旋转',
-    unfoldBtn:  '展开',
+    explodeBtn:  '分离胞体',
     sliceBtn:   '切片',
     collapseBtn:'塌陷',
     stereoBtn:  '立体投影',
@@ -906,7 +906,7 @@ const I18N = {
     cellTitle:  '胞颜色',
     cellAll:    '显示全部',
     cellReset:  '重置',
-    unfoldUnsupported: '600-cell 的展开不可用（600个四面体胞腔过于复杂）。请选择 8-cell、5-cell、16-cell 或 24-cell。',
+    explodeUnsupported: '600-cell 的分离视图不可用（600个四面体胞腔过于复杂）。请选择 8-cell、5-cell、16-cell 或 24-cell。',
     resetView:  '重置视角',
     dragHint:   '拖动旋转 · 滚轮缩放',
     stopDemo:   '停止演示',
@@ -962,11 +962,11 @@ const I18N = {
     tut_next: '下一步 →',
     tut_start: '开始探索！',
     tut_titles: ['什么是维度？','从3D到4D','探索第四维度','欢迎来到5D'],
-    tut_visuals: ['· → — → □ → ☐','□ + 深度 → ☐ + W轴','切片 · 展开 · 塌陷','☐ + V轴 → 五维超立方体 ⬡'],
+    tut_visuals: ['· → — → □ → ☐','□ + 深度 → ☐ + W轴','切片 · 分离 · 塌陷','☐ + V轴 → 五维超立方体 ⬡'],
     tut_bodies: [
       '维度是一个独立的运动方向。移动一个点 → 得到1D线段；让线段垂直移动 → 2D平面；叠加平面 → 3D空间。每一步都增加一个新的坐标轴。',
       '我们生活在3D世界，无法直接"看见"4D。我们用透视投影——就像在2D纸上画3D物体。第4个坐标轴叫做 W 轴。',
-      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割看截面、展开任意多面体查看其3D胞腔（8个立方体、5个四面体、16个四面体、24个八面体），或者让W轴塌陷成0，看4D如何变成3D。',
+      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割看截面、分离任意多面体的3D胞腔（8个立方体、5个四面体、16个四面体、24个八面体），或者让W轴塌陷成0，看4D如何变成3D。',
       'DimViz V005 新增5D和更多功能！探索6种正则4D多胞体中的5种（16-cell、24-cell、使用黄金比例的600-cell），为超立方体的每个胞体独立着色，独立控制全部6个旋转平面，以及切换立体投影模式查看弯曲棱边。'
     ],
   }
@@ -1347,12 +1347,22 @@ function get600CellVertices() {
   for (let i = 0; i < 4; i++) for (let s of [-1,1]) { const v = [0,0,0,0]; v[i] = s; verts.push(v); }
   // Group 2: (±½,±½,±½,±½) → 16
   for (let i = 0; i < 16; i++) verts.push([(i&1)?0.5:-0.5,(i&2)?0.5:-0.5,(i&4)?0.5:-0.5,(i&8)?0.5:-0.5]);
-  // Group 3: even permutations of (±φ/2, ±½, ±1/(2φ), 0) → 96
+  // Group 3: even permutations of (0, ½, φ/2, 1/(2φ)),
+  // with independent signs on ALL non-zero coordinates → 96
   const evenPerms = [[0,1,2,3],[0,2,3,1],[0,3,1,2],[1,0,3,2],[1,2,0,3],[1,3,2,0],[2,0,1,3],[2,1,3,0],[2,3,0,1],[3,0,2,1],[3,1,0,2],[3,2,1,0]];
-  const base = [PHI_GOLD/2, 0.5, 1/(2*PHI_GOLD), 0];
+  const base = [0, 0.5, PHI_GOLD/2, 1/(2*PHI_GOLD)];
   for (const perm of evenPerms) {
-    for (let s0 = -1; s0 <= 1; s0 += 2) for (let s1 = -1; s1 <= 1; s1 += 2) for (let s2 = -1; s2 <= 1; s2 += 2) {
-      verts.push([s0*base[perm[0]], s1*base[perm[1]], s2*base[perm[2]], base[perm[3]]]);
+    const permuted = perm.map(i => base[i]); // e.g. [0, 0.5, φ/2, 1/(2φ)]
+    // Collect indices of non-zero coordinates in permuted order
+    const nzIdx = [];
+    for (let k = 0; k < 4; k++) if (Math.abs(permuted[k]) > 1e-12) nzIdx.push(k);
+    // Apply independent signs to all non-zero coords (3 signs for 3 nz entries)
+    for (let mask = 0; mask < (1 << nzIdx.length); mask++) {
+      const v = permuted.slice();
+      for (let j = 0; j < nzIdx.length; j++) {
+        if (!((mask >> j) & 1)) v[nzIdx[j]] = -v[nzIdx[j]];
+      }
+      verts.push(v);
     }
   }
   // Scale up for visibility
@@ -1378,6 +1388,11 @@ let cell600Edges    = null;
 try {
   cell600Verts4D = get600CellVertices();
   cell600Edges   = get600CellEdges(cell600Verts4D);
+  // Validate 600-cell topology
+  const unique600 = new Set(cell600Verts4D.map(v => v.map(x => x.toFixed(10)).join(',')));
+  console.assert(cell600Verts4D.length === 120, '600-cell: expected 120 vertices, got ' + cell600Verts4D.length);
+  console.assert(unique600.size === 120, '600-cell: expected 120 unique vertices, got ' + unique600.size);
+  console.assert(cell600Edges.length === 720, '600-cell: expected 720 edges, got ' + cell600Edges.length);
 } catch(e) { console.warn('600-cell init failed:', e); }
 
 /* ── Tesseract cells for cell coloring (V005) ── */
@@ -1786,10 +1801,10 @@ function convexHull3D(points) {
 function toggleUnfold() {
   if (currentDim !== 4) { setDim(4); }
   if (!UNFOLD_DEFS[current4DObject]) {
-    // 600-cell: too many cells (600 tetrahedra) for unfold
+    // 600-cell: too many cells (600 tetrahedra) for exploded view
     const T = I18N[currentLang];
-    alert(T && T.unfoldUnsupported ? T.unfoldUnsupported :
-      'Unfold not available for this polytope (too many cells).');
+    alert(T && T.explodeUnsupported ? T.explodeUnsupported :
+      'Exploded view not available for this polytope (too many cells).');
     return;
   }
   unfoldMode = !unfoldMode;
@@ -2063,6 +2078,42 @@ function colorFromV(v5, mn=-2, mx=2) {
 const penteractVerts5D = getPenteractVertices();
 const penteractEdges   = getPenteractEdges(penteractVerts5D);
 
+/* ── Polytope topology validation ── */
+(function validatePolytopes() {
+  const specs = [
+    ['5-cell',     cell5Verts4D,     cell5Edges,     5,  10],
+    ['8-cell',     tesseractVerts4D, tesseractEdges, 16,  32],
+    ['16-cell',    cell16Verts4D,    cell16Edges,     8,  24],
+    ['24-cell',    cell24Verts4D,    cell24Edges,    24,  96],
+    ['600-cell',   cell600Verts4D,   cell600Edges,  120, 720],
+    ['Penteract',  penteractVerts5D, penteractEdges, 32,  80],
+  ];
+  let allPassed = true;
+  for (const [name, verts, edges, expV, expE] of specs) {
+    if (!verts || !edges) { console.warn(name + ': skipped (init failed)'); continue; }
+    const uniqueVerts = new Set(verts.map(v => v.map(x => x.toFixed(10)).join(',')));
+    const uniqueEdges = new Set(edges.map(([a,b]) => Math.min(a,b)+'-'+Math.max(a,b)));
+    if (verts.length !== expV) { console.error(name+': expected '+expV+' vertices, got '+verts.length); allPassed=false; }
+    if (uniqueVerts.size !== expV) { console.error(name+': expected '+expV+' unique vertices, got '+uniqueVerts.size); allPassed=false; }
+    if (edges.length !== expE) { console.error(name+': expected '+expE+' edges, got '+edges.length); allPassed=false; }
+    if (uniqueEdges.size !== expE) { console.error(name+': expected '+expE+' unique edges, got '+uniqueEdges.size); allPassed=false; }
+    const dim = verts[0].length;
+    const lengths = edges.map(([a,b]) => {
+      let d2=0; for(let k=0;k<dim;k++) d2+=(verts[a][k]-verts[b][k])**2; return Math.sqrt(d2);
+    });
+    const minL=Math.min(...lengths), maxL=Math.max(...lengths);
+    if (maxL - minL > 0.001 * maxL) { console.error(name+': edge lengths not uniform ('+minL.toFixed(4)+'..'+maxL.toFixed(4)+')'); allPassed=false; }
+    const degMap = new Map();
+    for (const [a,b] of edges) { degMap.set(a,(degMap.get(a)||0)+1); degMap.set(b,(degMap.get(b)||0)+1); }
+    const degrees = [...degMap.values()];
+    if (!degrees.every(d => d===degrees[0])) { console.error(name+': vertex degrees not uniform'); allPassed=false; }
+    for (const [a,b] of edges) {
+      if (a<0||a>=verts.length||b<0||b>=verts.length) { console.error(name+': invalid edge endpoint'); allPassed=false; break; }
+    }
+  }
+  if (allPassed) console.log('✅ All polytope topology validations passed');
+})();
+
 function rebuild5DGeometry() {
   // Clear g5d children
   while(g5d.children.length) {
@@ -2231,91 +2282,4 @@ function stopDemo() {
 function toggleDemo() { demoRunning?stopDemo():startDemo(); }
 
 function toggleAutoRotate() {
-  controls.autoRotate=!controls.autoRotate;
-  document.getElementById('btn-rotate').classList.toggle('active',controls.autoRotate);
-}
-function toggle4DRotate() {
-  is4DRotating=!is4DRotating;
-  document.getElementById('btn-4d-rotate').classList.toggle('active',is4DRotating);
-  const hint=document.getElementById('hint-4d');
-  if(is4DRotating&&currentDim===4) hint.classList.add('show');
-  else hint.classList.remove('show');
-}
-function toggle5DRotate() {
-  is5DRotating=!is5DRotating;
-  document.getElementById('btn-5d-rotate').classList.toggle('active',is5DRotating);
-}
-function resetCamera() {
-  camera.position.set(5,4,6);
-  controls.target.set(0,0,0);
-  controls.update();
-}
-
-/* ═══════════════════════════════════════════════
-   Animation Loop
-═══════════════════════════════════════════════ */
-let t=0;
-function animate() {
-  requestAnimationFrame(animate);
-  t+=0.016;
-
-  // 1D point animation
-  if(g1d.userData.point) g1d.userData.point.position.x = 2.5*Math.sin(t*0.7);
-
-  // Demo logic
-  if(demoRunning) {
-    const elapsed=performance.now()-demoStart;
-    const totalIdx=Math.floor(elapsed/stepDuration);
-    const stepProg=(elapsed%stepDuration)/stepDuration;
-    if(totalIdx>=demoSteps.length) {
-      demoStart=performance.now(); demoIdx=0; setDim(demoSteps[0],true);
-    } else {
-      if(totalIdx!==demoIdx){ demoIdx=totalIdx; setDim(demoSteps[demoIdx],true); }
-      document.getElementById('progress-bar').style.width=(((totalIdx+stepProg)/demoSteps.length)*100).toFixed(1)+'%';
-    }
-  }
-
-  // 4D auto rotation (V005: uses rot4Angles/rot4Speeds/rot4Active)
-  if(is4DRotating && currentDim===4 && !unfoldMode) {
-    ROT4_PLANES.forEach(p => { if (rot4Active[p]) rot4Angles[p] += rot4Speeds[p]; });
-    rebuild4DGeometry();
-  }
-
-  // 5D auto rotation (V005: uses rot5Angles/rot5Speeds/rot5Active)
-  if(is5DRotating && currentDim===5) {
-    ROT5_PLANES.forEach(p => { if (rot5Active[p]) rot5Angles[p] += rot5Speeds[p]; });
-    rebuild5DGeometry();
-  }
-
-  // Unfold animation
-  if(unfoldMode && currentDim===4 && UNFOLD_DEFS[current4DObject]) {
-    unfoldT = Math.min(1, Math.max(0, unfoldT + unfoldDir*UNFOLD_SPD));
-    updateUnfoldAnimation(unfoldT);
-    if(unfoldT>=1) unfoldDir=-1;
-    if(unfoldT<=0) unfoldDir=1;
-    const pct=Math.round(unfoldT*100);
-    document.getElementById('unfold-bar').style.width=pct+'%';
-    document.getElementById('unfold-pct').textContent=pct+'%';
-  }
-
-  controls.update();
-  renderer.render(scene, camera);
-}
-animate();
-
-/* ─── KaTeX initial render ─── */
-document.addEventListener('DOMContentLoaded', () => {
-  if(window.renderMathInElement) {
-    renderMathInElement(document.getElementById('formula-panel'), {
-      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
-    });
-  }
-  // Show tutorial only on first visit (localStorage)
-  if (!localStorage.getItem('dimviz_tutorial_seen')) {
-    openTutorial();
-    localStorage.setItem('dimviz_tutorial_seen', '1');
-  }
-});
-</script>
-</body>
-</html>
+  controls.autoRo

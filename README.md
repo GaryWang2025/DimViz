@@ -18,16 +18,16 @@
 
 #### Core Visualization
 - 🎯 **Interactive 1D→5D** — Drag to rotate, scroll to zoom, auto-rotate
-- 📐 **Rigorous Math** — KaTeX LaTeX formula panel for each dimension (ℝ¹→ℝ⁵)
+- 📐 **Rigorous Math** — KaTeX LaTeX formula panel for each dimension (ℝ¹→ℝ⁵); topology validated (unique vertices, uniform edge lengths, uniform vertex degrees)
 - 🎬 **Auto Demo** — Watch dimensions unfold: 1D → 2D → 3D → 4D → 5D
 
 #### 4D Features
 - 🌀 **Tesseract (Hypercube)** — Perspective projection ℝ⁴→ℝ³, W encoded as color gradient
 - 🔺 **5 Regular 4-Polytopes** — 5-cell, 8-cell, 16-cell, 24-cell, 600-cell (of the 6 convex regular 4-polytopes; 120-cell omitted for performance)
 - 🎨 **Cell Coloring** — Each tesseract cell gets a unique color; isolate individual cells
-- 🌐 **Stereographic Projection** — Conformal projection with curved (slerp-interpolated) edges
+- 🌐 **Spherical Stereographic Projection** — Vertices normalized to S³; edges visualized via great-circle interpolation before stereographic projection (conformal, curved edges)
 - 🎛️ **Per-Plane Rotation** — All 6 rotation planes (4D) / 10 planes (5D) with independent speed & toggle
-- 📦 **Unfold Animation** — Tesseract unfolds into Dalí cross (8 cells → 3D cross)
+- 💥 **Exploded-Cell View** — Separate all 3D cells of a 4D polytope (8 cubes, 5 tetrahedra, 16 tetrahedra, 24 octahedra)
 - 🔪 **4D Slice** — W-axis cross-section showing the true **3D polyhedron** (convex hull)
 - 🔀 **Dimension Collapse** — Watch 4D continuously collapse into 3D (paired vertex interpolation)
 
@@ -97,16 +97,16 @@ MIT © 2026
 
 #### 核心可视化
 - 🎯 **可交互 1D→5D** — 拖动旋转，滚轮缩放，自动旋转
-- 📐 **严格数学** — KaTeX LaTeX 公式面板，覆盖 ℝ¹→ℝ⁵
+- 📐 **严格数学** — KaTeX LaTeX 公式面板，覆盖 ℝ¹→ℝ⁵；拓扑验证（唯一顶点、等长棱、等度数）
 - 🎬 **自动演示** — 观看维度展开：1D → 2D → 3D → 4D → 5D
 
 #### 4D 功能
 - 🌀 **超立方体（Tesseract）** — 透视投影 ℝ⁴→ℝ³，第4维（W）编码为颜色渐变
 - 🔺 **5种正则4D多胞体** — 5-cell、8-cell、16-cell、24-cell、600-cell（6种凸正则4-多胞体中的5种；120-cell因性能省略）
 - 🎨 **胞体着色** — 超立方体每个胞体独立颜色，可单独隔离显示
-- 🌐 **立体投影** — 保角映射，棱边显示为弧线（slerp插值）
+- 🌐 **球面立体投影** — 顶点归一化到 S³，棱边以大圆插值表示再进行立体投影（保角、弧线棱边）
 - 🎛️ **旋转平面独立控制** — 4D全部6平面 / 5D全部10平面，各自独立调速和开关
-- 📦 **展开动画** — 超立方体展开为达利十字（8个立方体胞→3D十字形）
+- 💥 **胞体分离视图** — 分离 4D 多胞体的所有 3D 胞腔（8个立方体、5个四面体、16个四面体、24个八面体）
 - 🔪 **4D 切片** — W轴截面，显示**真正的3D多面体**（凸包算法）
 - 🔀 **维度塌陷** — 亲眼看4D连续塌缩为3D（成对顶点插值）
 
