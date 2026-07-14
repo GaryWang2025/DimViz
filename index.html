@@ -1007,6 +1007,7 @@ let tutStep = 0;
 const TUT_TOTAL = 4;
 
 function openTutorial() {
+  if (demoRunning) stopDemo();
   tutStep = 0;
   document.getElementById('tutorial-overlay').classList.remove('hidden');
   applyTutorialStep(0);
@@ -1235,10 +1236,16 @@ function project4DTo3D(v4, f=3.0) {
     let r = Math.sqrt(v4[0]*v4[0]+v4[1]*v4[1]+v4[2]*v4[2]+v4[3]*v4[3]);
     if (r < 1e-9) r = 1e-9;
     const x=v4[0]/r, y=v4[1]/r, z=v4[2]/r, w=v4[3]/r;
-    const denom = 1 - w;
-    if (Math.abs(denom) < 0.01) return [0,0,0];
+    // Clamp denominator while preserving sign (avoid jump to origin near pole)
+    const rawDenom = 1 - w;
+    const denom = Math.abs(rawDenom) < 0.01 ? (rawDenom >= 0 ? 0.01 : -0.01) : rawDenom;
     const s = 2.0 / denom;
-    return [x*s*1.5, y*s*1.5, z*s*1.5];
+    let px = x*s*1.5, py = y*s*1.5, pz = z*s*1.5;
+    // Limit max projection radius to prevent extreme outliers
+    const maxR = 12;
+    const pr = Math.sqrt(px*px + py*py + pz*pz);
+    if (pr > maxR) { const sc = maxR / pr; px*=sc; py*=sc; pz*=sc; }
+    return [px, py, pz];
   }
   const w = v4[3];
   const denom = f - w;
@@ -2104,9 +2111,10 @@ const penteractEdges   = getPenteractEdges(penteractVerts5D);
     });
     const minL=Math.min(...lengths), maxL=Math.max(...lengths);
     if (maxL - minL > 0.001 * maxL) { console.error(name+': edge lengths not uniform ('+minL.toFixed(4)+'..'+maxL.toFixed(4)+')'); allPassed=false; }
-    const degMap = new Map();
-    for (const [a,b] of edges) { degMap.set(a,(degMap.get(a)||0)+1); degMap.set(b,(degMap.get(b)||0)+1); }
-    const degrees = [...degMap.values()];
+    // Use Array to ensure all vertices are covered (catch isolated vertices)
+    const degrees = Array(verts.length).fill(0);
+    for (const [a,b] of edges) { degrees[a]++; degrees[b]++; }
+    if (degrees.some(d => d === 0)) { console.error(name+': isolated vertex detected'); allPassed=false; }
     if (!degrees.every(d => d===degrees[0])) { console.error(name+': vertex degrees not uniform'); allPassed=false; }
     for (const [a,b] of edges) {
       if (a<0||a>=verts.length||b<0||b>=verts.length) { console.error(name+': invalid edge endpoint'); allPassed=false; break; }
@@ -2247,11 +2255,17 @@ function setDim(d, fromDemo=false) {
     if (unfoldMode)   { unfoldMode=false;   document.getElementById('btn-unfold').classList.remove('active'); unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show'); }
     if (cellColorMode){ cellColorMode=false;cellIsolated=-1;  document.getElementById('btn-cellcolor').classList.remove('active'); document.getElementById('cell-panel').classList.remove('show'); needRebuild=true; }
     if (stereoMode)   { stereoMode=false;  document.getElementById('btn-stereo').classList.remove('active'); needRebuild=true; }
+    // Hide 4D rotation hint
+    document.getElementById('hint-4d').classList.remove('show');
+    // Reset collapse info text
+    document.getElementById('collapse-info').textContent = currentLang==='en'?'0% — fully 4D':'0% — 完整4D状态';
     if (needRebuild) rebuild4DGeometry();
   }
   if (!is4 && !is5) {
     document.getElementById('rot-panel').classList.remove('show');
   }
+  // Sync 4D rotation hint visibility with current dimension
+  document.getElementById('hint-4d').classList.toggle('show', is4 && is4DRotating);
   // Refresh rotation panel when switching between 4D and 5D
   if ((is4 || is5) && document.getElementById('rot-panel').classList.contains('show')) {
     buildRotPanel();
