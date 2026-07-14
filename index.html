@@ -619,7 +619,7 @@
       <div class="desc" data-i18n="desc_1d_space">A one-dimensional vector space over the real numbers ℝ, the set of all real numbers.</div>
       <div class="katex-block">$$\mathbb{R}^1 = \{x \mid x \in \mathbb{R}\}$$</div>
       <div class="def-title" data-i18n="basis">Basis</div>
-      <div class="desc" data-i18n="desc_1d_basis">The unique basis vector $\mathbf{e}_1$; any vector is a scalar multiple of it.</div>
+      <div class="desc" data-i18n="desc_1d_basis">The standard basis vector $\mathbf{e}_1$; any vector is a scalar multiple of it.</div>
       <div class="katex-block">$$\mathbf{e}_1 = (1) \quad \dim(\mathbb{R}^1) = 1$$</div>
       <div class="katex-block">$$\mathbf{x} = x_1 \mathbf{e}_1, \quad x_1 \in \mathbb{R}$$</div>
       <div class="def-title" data-i18n="norm">Norm</div>
@@ -710,7 +710,7 @@
       <div class="def-title" data-i18n="euclidNorm">Euclidean Norm</div>
       <div class="katex-block">$$\|\mathbf{v}\| = \sqrt{\sum_{i=1}^{5} v_i^2}$$</div>
       <div class="def-title" data-i18n="rot5d">5D Rotation Group SO(5)</div>
-      <div class="desc" data-i18n="desc_5d_rot">5D rotation acts in 10 independent planes: $\binom{5}{2}=10$. Each plane has a rotation angle. This demo uses 4 simultaneously.</div>
+      <div class="desc" data-i18n="desc_5d_rot">5D rotation acts in 10 independent planes: $\binom{5}{2}=10$. Each plane has a rotation angle. Four rotation planes are active by default.</div>
       <div class="katex-block">$$|\text{Rotation planes in } \mathbb{R}^n| = \binom{n}{2} = \frac{n(n-1)}{2}$$</div>
       <div class="katex-block">$$\mathbb{R}^1: 0,\ \mathbb{R}^2: 1,\ \mathbb{R}^3: 3,\ \mathbb{R}^4: 6,\ \mathbb{R}^5: 10$$</div>
       <div class="def-title" data-i18n="penteract">Penteract (5D Hypercube)</div>
@@ -846,7 +846,7 @@ const I18N = {
     penteract:  'Penteract (5D Hypercube)',
     doubleProj: 'Double Perspective Projection',
     desc_1d_space: 'A one-dimensional vector space over the real numbers ℝ, the set of all real numbers.',
-    desc_1d_basis: 'The unique basis vector e₁; any vector is a scalar multiple of it.',
+    desc_1d_basis: 'The standard basis vector e₁; any vector is a scalar multiple of it.',
     desc_1d_norm:  'A measure of vector length satisfying positivity, homogeneity, and the triangle inequality.',
     desc_2d_space: 'The set of all ordered pairs of real numbers with addition and scalar multiplication.',
     desc_4d_space: 'Ordered 4-tuples of independent real coordinates. Cannot be directly perceived visually; understood through projection and analogy.',
@@ -859,7 +859,7 @@ const I18N = {
     desc_stereoProj:'Conformal (angle-preserving) projection from the 3-sphere. Edges appear as arcs, revealing internal structure more clearly than perspective projection.',
     desc_s3:       'The set of points in ℝ⁴ at distance 1 from the origin (a 3-dimensional hypersphere).',
     desc_5d_space: 'Five independent real coordinates. Visualized via double perspective projection: 5D→4D→3D, composing two successive projections.',
-    desc_5d_rot:   '5D rotation acts in 10 independent planes: C(5,2)=10. Each plane has a rotation angle. This demo uses 4 simultaneously.',
+    desc_5d_rot:   '5D rotation acts in 10 independent planes: C(5,2)=10. Each plane has a rotation angle. Four rotation planes are active by default.',
     desc_penteract:'The 5D analog of a cube: 32 vertices, 80 edges, 80 square faces, 40 cubic cells, 10 tesseract cells.',
     desc_doubleProj:'First project 5D → 4D along the v axis, then 4D → 3D along the w axis.',
     // Tutorial
@@ -873,7 +873,7 @@ const I18N = {
     tut_bodies: [
       'A dimension is an independent direction of movement. Move a point → 1D line. Move that line perpendicular → 2D plane. Stack planes → 3D space. Each step adds one new axis.',
       'We live in 3D, so we can\'t "see" 4D directly. Instead, we use perspective projection — the same trick used to draw 3D objects on 2D paper. The 4th axis is called W.',
-      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, explode any polytope to separate its 3D cells (8 cubes, 5 tetrahedra, 16 tetrahedra, 24 octahedra), or collapse W to watch 4D become 3D.',
+      'In 4D mode you can: rotate in 6 planes (not just 3), slice the tesseract with a W-axis plane to see cross-sections, explode any supported polytope to separate its 3D cells (8 cubes, 5 tetrahedra, 16 tetrahedra, 24 octahedra), or collapse W to watch 4D become 3D.',
       'DimViz V005 adds 5D and more! Explore 5 of the 6 regular 4D polytopes (16-cell, 24-cell, 600-cell with golden ratio), color individual tesseract cells, control all 6 rotation planes independently, and switch to stereographic projection for curved edges.'
     ],
   },
@@ -940,7 +940,7 @@ const I18N = {
     penteract:  '五维超立方体（Penteract）',
     doubleProj: '双重透视投影',
     desc_1d_space: '实数域 ℝ 上的一维向量空间，即全体实数的集合。',
-    desc_1d_basis: '唯一的基向量 e₁，任何向量都是它的标量倍数。',
+    desc_1d_basis: '标准基向量 e₁，任何向量都是它的标量倍数。',
     desc_1d_norm:  '满足正定性、齐次性和三角不等式的向量长度度量。',
     desc_2d_space: '全体有序实数对的集合，配备加法和标量乘法运算。',
     desc_4d_space: '4个独立实坐标的有序4元组。无法直接感知，需通过投影和类比理解。',
@@ -953,7 +953,7 @@ const I18N = {
     desc_stereoProj:'保角映射（保持角度不变），从三维球面投影。边缘显示为弧线，比透视投影更清晰地展示内部结构。',
     desc_s3:       'ℝ⁴中到原点距离为1的点的集合（一个3维超球面）。',
     desc_5d_space: '五个独立实坐标。通过双重透视投影可视化：5D→4D→3D，连续应用两次透视变换。',
-    desc_5d_rot:   '5D空间中的旋转有 C(5,2)=10 个独立旋转平面。本演示同时驱动其中4个。',
+    desc_5d_rot:   '5D空间中的旋转有 C(5,2)=10 个独立旋转平面。默认启用其中4个旋转平面。',
     desc_penteract:'立方体的5D类比：32个顶点，80条棱，80个正方形面，40个立方体胞，10个超立方体胞。',
     desc_doubleProj:'先沿 v 轴将5D投影到4D，再沿 w 轴将4D投影到3D。',
     tut_step: '第',
@@ -966,7 +966,7 @@ const I18N = {
     tut_bodies: [
       '维度是一个独立的运动方向。移动一个点 → 得到1D线段；让线段垂直移动 → 2D平面；叠加平面 → 3D空间。每一步都增加一个新的坐标轴。',
       '我们生活在3D世界，无法直接"看见"4D。我们用透视投影——就像在2D纸上画3D物体。第4个坐标轴叫做 W 轴。',
-      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割看截面、分离任意多面体的3D胞腔（8个立方体、5个四面体、16个四面体、24个八面体），或者让W轴塌陷成0，看4D如何变成3D。',
+      '在4D模式下你可以：在6个平面内旋转（而不只是3个）、用W轴截面切割看截面、分离受支持多胞体的3D胞腔（8个立方体、5个四面体、16个四面体、24个八面体），或者让W轴塌陷成0，看4D如何变成3D。',
       'DimViz V005 新增5D和更多功能！探索6种正则4D多胞体中的5种（16-cell、24-cell、使用黄金比例的600-cell），为超立方体的每个胞体独立着色，独立控制全部6个旋转平面，以及切换立体投影模式查看弯曲棱边。'
     ],
   }
@@ -1538,7 +1538,7 @@ function toggleCellColor() {
 function buildCellPanel() {
   const grid = document.getElementById('cell-grid');
   grid.innerHTML = '';
-  const labels = ['W-','W+','Z-','Z+','Y-','Y+','X-','X+'];
+  const labels = ['X-','X+','Y-','Y+','Z-','Z+','W-','W+'];
   for (let i = 0; i < tesseractCellDefs.length; i++) {
     const cell = tesseractCellDefs[i];
     const chip = document.createElement('div');
@@ -1902,16 +1902,17 @@ function rebuild4DGeometry() {
 
   if (sliceMode && !collapseMode) {
     // ── True 4D Cross-Section Visualization ──
+    // Intersect in 4D first, THEN project to 3D (perspective is non-linear)
     const ipts3 = [];
     for (const [ei, ej] of edges4D) {
       const wi = rotated[ei][3], wj = rotated[ej][3];
       if ((wi - sliceW) * (wj - sliceW) > 0) continue;
       if (Math.abs(wi - wj) < 1e-9) continue;
       const alpha = (sliceW - wi) / (wj - wi);
-      const px = pts3D[ei][0] + alpha * (pts3D[ej][0] - pts3D[ei][0]);
-      const py = pts3D[ei][1] + alpha * (pts3D[ej][1] - pts3D[ei][1]);
-      const pz = pts3D[ei][2] + alpha * (pts3D[ej][2] - pts3D[ei][2]);
-      ipts3.push(new THREE.Vector3(px, py, pz));
+      // Compute 4D intersection point, then project
+      const p4 = rotated[ei].map((val, k) => val + alpha * (rotated[ej][k] - val));
+      const p3 = project4DTo3D(p4, 3.5);
+      ipts3.push(new THREE.Vector3(p3[0], p3[1], p3[2]));
     }
     let hullResult = null;
     if (ipts3.length >= 4) { hullResult = convexHull3D(ipts3); }
@@ -2240,14 +2241,20 @@ function setDim(d, fromDemo=false) {
 
   if (!is4) {
     // Clean up 4D-specific panels if switching away
-    if (sliceMode)    { sliceMode=false;   document.getElementById('slice-panel').classList.remove('show'); }
-    if (collapseMode) { collapseMode=false; document.getElementById('collapse-panel').classList.remove('show'); }
+    let needRebuild = false;
+    if (sliceMode)    { sliceMode=false;   document.getElementById('btn-slice').classList.remove('active'); document.getElementById('slice-panel').classList.remove('show'); needRebuild=true; }
+    if (collapseMode) { collapseMode=false; collapseAlpha=0; document.getElementById('btn-collapse').classList.remove('active'); document.getElementById('collapse-panel').classList.remove('show'); document.getElementById('collapse-slider').value=0; needRebuild=true; }
     if (unfoldMode)   { unfoldMode=false;   document.getElementById('btn-unfold').classList.remove('active'); unfoldGroup.visible=false; document.getElementById('unfold-panel').classList.remove('show'); }
-    if (cellColorMode){ cellColorMode=false;document.getElementById('btn-cellcolor').classList.remove('active'); document.getElementById('cell-panel').classList.remove('show'); }
-    if (stereoMode)   { stereoMode=false;  document.getElementById('btn-stereo').classList.remove('active'); }
+    if (cellColorMode){ cellColorMode=false;cellIsolated=-1;  document.getElementById('btn-cellcolor').classList.remove('active'); document.getElementById('cell-panel').classList.remove('show'); needRebuild=true; }
+    if (stereoMode)   { stereoMode=false;  document.getElementById('btn-stereo').classList.remove('active'); needRebuild=true; }
+    if (needRebuild) rebuild4DGeometry();
   }
   if (!is4 && !is5) {
     document.getElementById('rot-panel').classList.remove('show');
+  }
+  // Refresh rotation panel when switching between 4D and 5D
+  if ((is4 || is5) && document.getElementById('rot-panel').classList.contains('show')) {
+    buildRotPanel();
   }
 
   if (window.renderMathInElement) {
@@ -2282,4 +2289,91 @@ function stopDemo() {
 function toggleDemo() { demoRunning?stopDemo():startDemo(); }
 
 function toggleAutoRotate() {
-  controls.autoRo
+  controls.autoRotate=!controls.autoRotate;
+  document.getElementById('btn-rotate').classList.toggle('active',controls.autoRotate);
+}
+function toggle4DRotate() {
+  is4DRotating=!is4DRotating;
+  document.getElementById('btn-4d-rotate').classList.toggle('active',is4DRotating);
+  const hint=document.getElementById('hint-4d');
+  if(is4DRotating&&currentDim===4) hint.classList.add('show');
+  else hint.classList.remove('show');
+}
+function toggle5DRotate() {
+  is5DRotating=!is5DRotating;
+  document.getElementById('btn-5d-rotate').classList.toggle('active',is5DRotating);
+}
+function resetCamera() {
+  camera.position.set(5,4,6);
+  controls.target.set(0,0,0);
+  controls.update();
+}
+
+/* ═══════════════════════════════════════════════
+   Animation Loop
+═══════════════════════════════════════════════ */
+let t=0;
+function animate() {
+  requestAnimationFrame(animate);
+  t+=0.016;
+
+  // 1D point animation
+  if(g1d.userData.point) g1d.userData.point.position.x = 2.5*Math.sin(t*0.7);
+
+  // Demo logic
+  if(demoRunning) {
+    const elapsed=performance.now()-demoStart;
+    const totalIdx=Math.floor(elapsed/stepDuration);
+    const stepProg=(elapsed%stepDuration)/stepDuration;
+    if(totalIdx>=demoSteps.length) {
+      demoStart=performance.now(); demoIdx=0; setDim(demoSteps[0],true);
+    } else {
+      if(totalIdx!==demoIdx){ demoIdx=totalIdx; setDim(demoSteps[demoIdx],true); }
+      document.getElementById('progress-bar').style.width=(((totalIdx+stepProg)/demoSteps.length)*100).toFixed(1)+'%';
+    }
+  }
+
+  // 4D auto rotation (V005: uses rot4Angles/rot4Speeds/rot4Active)
+  if(is4DRotating && currentDim===4 && !unfoldMode) {
+    ROT4_PLANES.forEach(p => { if (rot4Active[p]) rot4Angles[p] += rot4Speeds[p]; });
+    rebuild4DGeometry();
+  }
+
+  // 5D auto rotation (V005: uses rot5Angles/rot5Speeds/rot5Active)
+  if(is5DRotating && currentDim===5) {
+    ROT5_PLANES.forEach(p => { if (rot5Active[p]) rot5Angles[p] += rot5Speeds[p]; });
+    rebuild5DGeometry();
+  }
+
+  // Unfold animation
+  if(unfoldMode && currentDim===4 && UNFOLD_DEFS[current4DObject]) {
+    unfoldT = Math.min(1, Math.max(0, unfoldT + unfoldDir*UNFOLD_SPD));
+    updateUnfoldAnimation(unfoldT);
+    if(unfoldT>=1) unfoldDir=-1;
+    if(unfoldT<=0) unfoldDir=1;
+    const pct=Math.round(unfoldT*100);
+    document.getElementById('unfold-bar').style.width=pct+'%';
+    document.getElementById('unfold-pct').textContent=pct+'%';
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();
+
+/* ─── KaTeX initial render ─── */
+document.addEventListener('DOMContentLoaded', () => {
+  if(window.renderMathInElement) {
+    renderMathInElement(document.getElementById('formula-panel'), {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
+    });
+  }
+  // Show tutorial only on first visit (localStorage)
+  if (!localStorage.getItem('dimviz_tutorial_seen')) {
+    openTutorial();
+    localStorage.setItem('dimviz_tutorial_seen', '1');
+  }
+});
+</script>
+</body>
+</html>
