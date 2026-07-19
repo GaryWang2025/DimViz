@@ -1,0 +1,50 @@
+Line 5: <title>维度数学图示 V002 | Dimension Visualizer 4D</title>
+Line 214: <h1>维度数学图示 <span style='font-size:0.7rem;opacity:0.7;'>V002 &middot; 4D</span></h1>
+Line 222: <div id="demo-hint">自动演示进行中…</div>
+Line 223: <div id="hint-4d">4D旋转中…</div>
+Line 228: <!-- 1D 公式 -->
+Line 230: <h3>ℝ¹ · 一维空间</h3>
+Line 232: <div class="def-title">空间定义</div>
+Line 233: <div class="desc">实数集 ℝ 上的一维向量空间，所有实数的集合。</div>
+Line 236: <div class="def-title">基底 (Basis)</div>
+Line 237: <div class="desc">唯一基向量 $\mathbf{e}_1$，任意向量均为其标量倍。</div>
+Line 241: <div class="def-title">范数 (Norm)</div>
+Line 242: <div class="desc">向量长度的度量，满足正定性、齐次性与三角不等式。</div>
+Line 245: <div class="def-title">线性映射 $T: \mathbb{R}^1 \to \mathbb{R}^1$</div>
+Line 249: <!-- 2D 公式 -->
+Line 251: <h3>ℝ² · 二维空间</h3>
+Line 253: <div class="def-title">空间定义</div>
+Line 254: <div class="desc">所有有序实数对构成的集合，具有加法和标量乘法运算。</div>
+Line 257: <div class="def-title">标准正交基</div>
+Line 261: <div class="def-title">欧氏范数</div>
+Line 264: <div class="def-title">线性变换 $A: \mathbb{R}^2 \to \mathbb{R}^2$</div>
+Line 267: <div class="def-title">旋转矩阵</div>
+Line 271: <!-- 3D 公式 -->
+Line 273: <h3>ℝ³ · 三维空间</h3>
+Line 275: <div class="def-title">空间定义</div>
+Line 278: <div class="def-title">标准正交基</div>
+Line 282: <div class="def-title">欧氏范数</div>
+Line 285: <div class="def-title">内积 (Dot Product)</div>
+Line 288: <div class="def-title">叉积 (Cross Product)</div>
+Line 291: <div class="def-title">线性变换 $A \in \mathbb{R}^{3\times 3}$</div>
+Line 294: <div class="def-title">单位球面</div>
+Line 297: <!-- 4D 公式（新增） -->
+Line 299: <h3>ℝ⁴ · 四维空间</h3>
+Line 300: <div class="def-title">空间定义</div>
+Line 301: <div class="desc">四个独立实数坐标的有序四元组，无法直接视觉感知，通过投影与类比理解。</div>
+Line 303: <div class="def-title">标准正交基</div>
+Line 307: <div class="def-title">欧氏范数</div>
+Line 309: <div class="def-title">内积</div>
+Line 312: <div class="def-title">4D 旋转矩阵 $SO(4)$</div>
+Line 313: <div class="desc">4D 中的旋转发生在两个坐标平面（如 $xy, xw, yw$ 等），共 6 个独立旋转平面。</div>
+Line 315: <div class="def-title">超立方体（Tesseract）</div>
+Line 316: <div class="desc">ℝ⁴ 中的立方体类比：8 个立方体胞腔、24 个正方形面、32 条边、16 个顶点。</div>
+Line 317: <div class="katex-block">$$	ext{顶点：} (\pm 1, \pm 1, \pm 1, \pm 1) \quad (16 	ext{ 个})$$</div>
+Line 318: <div class="def-title">单位超球面 $S^3$</div>
+Line 319: <div class="desc">ℝ⁴ 中到原点距离为 1 的点的集合（三维超球面）。</div>
+Line 321: <div class="katex-block">$$	ext{超体积}(S^3) = 2\pi^2$$</div>
+Line 329: <span class="ctrl-label">维度：</span>
+Line 335: <button id="btn-4d-rotate" onclick="toggle4DRotate()">⟳ 4D旋转</button>
+Line 339: <button id="btn-demo" onclick="toggleDemo()">▶ 自动演示</button>
+Line 343: <button id="btn-rotate" class="active" onclick="toggleAutoRotate()">⟳ 自动旋转</button>
+Line 347: <button onclick="resetCamera()">↺ 重置视角</button>
